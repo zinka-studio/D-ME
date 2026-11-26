@@ -1,0 +1,22 @@
+{
+  "name": "d-me",
+  "version": "1.0.0",
+  "private": true,
+  "type": "module",
+  "scripts": {
+    "check": "wrangler types && tsc --noEmit",
+    "dev": "wrangler dev --local",
+    "test": "vitest run",
+    "types": "wrangler types",
+    "deploy:dry": "wrangler deploy --dry-run",
+    "deploy": "wrangler deploy --config wrangler.local.jsonc",
+    "setup": "node scripts/setup.mjs"
+  },
+  "devDependencies": {
+    "@cloudflare/vitest-plugin": "^1.1.12",
+    "@types/node": "^26.6.1",
+    "typescript": "^7.0.2",
+    "vitest": "^4.1.11",
+    "wrangler": "^4.134.0"
+  }
+}

@@ -1,0 +1,10 @@
+node_modules/
+.dev.vars
+.env
+.wrangler/
+dist/
+coverage/
+worker-configuration.d.ts
+wrangler.local.jsonc
+.d-me-install.json
+d-me-tokens.txt
