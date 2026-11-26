@@ -14,7 +14,7 @@ body{overflow-x:clip;margin:0;background:var(--bg);color:var(--text);font-family
 a{color:var(--accent-strong)}
 button{font:inherit;color:inherit;cursor:pointer}
 :focus-visible{outline:2px solid var(--accent);outline-offset:2px}
-.wrap{display:grid;grid-template-columns:minmax(0,1fr) 260px;gap:48px;max-width:1120px;margin:0 auto;padding:32px max(16px,env(safe-area-inset-left,0px)) 96px max(16px,env(safe-area-inset-right,0px))}
+.wrap{display:grid;grid-template-columns:260px minmax(0,1fr);gap:48px;max-width:1120px;margin:0 auto;padding:32px max(16px,env(safe-area-inset-left,0px)) 96px max(16px,env(safe-area-inset-right,0px))}
 header{grid-column:1/-1;padding:24px 0 8px}
 .brand{font-weight:800;font-size:1.25rem;letter-spacing:-.02em}
 h1{margin:12px 0 8px;font-size:clamp(2rem,5vw,3rem);line-height:1.15;font-weight:700;text-wrap:balance}
@@ -24,10 +24,11 @@ h1 .dot{color:var(--accent)}
 .bar{flex:1;max-width:420px;height:8px;border-radius:99px;background:var(--soft);overflow:hidden}
 .bar i{display:block;height:100%;width:0;background:var(--accent);transition:width .3s}
 .count{font-size:.875rem;color:var(--muted);font-variant-numeric:tabular-nums}
-main{min-width:0;display:grid;gap:20px}
-nav{position:sticky;top:24px;align-self:start;display:grid;gap:2px;font-size:.9375rem}
-nav a{display:flex;gap:10px;align-items:baseline;padding:8px 12px;border-radius:10px;color:var(--muted);text-decoration:none}
+main{grid-column:2;grid-row:2;min-width:0;display:grid;gap:20px}
+nav{grid-column:1;grid-row:2;position:sticky;top:24px;align-self:start;display:grid;gap:2px;font-size:.9375rem}
+nav a{display:flex;gap:10px;align-items:baseline;padding:9px 12px;border-radius:10px;color:var(--muted);text-decoration:none;cursor:pointer;transition:background .15s,color .15s}
 nav a:hover{background:var(--soft);color:var(--text)}
+nav a.current{background:var(--accent-soft);color:var(--accent-strong);font-weight:500}
 nav a.done{color:var(--text)}
 nav a.done::after{content:"\2713";margin-inline-start:auto;color:var(--accent-strong)}
 nav b{min-width:1.4em;font-variant-numeric:tabular-nums;color:var(--accent-strong)}
@@ -58,7 +59,7 @@ th{color:var(--muted);font-weight:500}
 .table-wrap{overflow-x:auto}
 .note{padding:14px 16px;border:1px solid var(--line-strong);border-radius:12px;font-size:.9375rem}
 footer{grid-column:1/-1;color:var(--muted);font-size:.875rem;padding-top:8px}
-@media(max-width:900px){.wrap{grid-template-columns:minmax(0,1fr);gap:24px}nav{display:none}.intro,.step{padding:20px}}
+@media(max-width:900px){.wrap{grid-template-columns:minmax(0,1fr);gap:24px}main{grid-column:1}nav{display:none}.intro,.step{padding:20px}}
 @media print{nav,.copy{display:none}.intro,.step{box-shadow:none;break-inside:avoid}}
 @media(prefers-reduced-motion:reduce){html{scroll-behavior:auto}.bar i{transition:none}}
 </style>
@@ -251,6 +252,7 @@ npm run deploy</pre></div>
     document.getElementById('count').textContent=done+' מתוך '+steps.length+' שלבים';
   }
   refresh();
+  if('IntersectionObserver' in window){var spy=new IntersectionObserver(function(entries){entries.forEach(function(e){if(e.isIntersecting){nav.querySelectorAll('a').forEach(function(a){a.classList.toggle('current',a.dataset.for===e.target.id)})}})},{rootMargin:'-20% 0px -65% 0px'});steps.forEach(function(st){spy.observe(st)})}
   function fallbackCopy(text){var t=document.createElement('textarea');t.value=text;t.style.position='fixed';t.style.opacity='0';document.body.appendChild(t);t.select();var ok=false;try{ok=document.execCommand('copy')}catch(e){}document.body.removeChild(t);return ok}
   document.querySelectorAll('.copy').forEach(function(btn){
     btn.addEventListener('click',function(){
