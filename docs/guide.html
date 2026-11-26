@@ -1,0 +1,266 @@
+<!doctype html>
+<html lang="he" dir="rtl">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width,initial-scale=1">
+<title>D-ME - מדריך הקמה</title>
+<style>
+@font-face{font-family:"Heebo";src:url("../public/fonts/Heebo-hebrew.woff2") format("woff2");font-weight:100 900;font-display:swap;unicode-range:U+0307-0308,U+0590-05FF,U+200C-2010,U+20AA,U+25CC,U+FB1D-FB4F}
+@font-face{font-family:"Heebo";src:url("../public/fonts/Heebo-latin.woff2") format("woff2");font-weight:100 900;font-display:swap;unicode-range:U+0000-00FF,U+0131,U+0152-0153,U+02BB-02BC,U+02C6,U+02DA,U+02DC,U+0304,U+0308,U+0329,U+2000-206F,U+20AC,U+2122,U+2191,U+2193,U+2212,U+2215,U+FEFF,U+FFFD}
+:root{--bg:#fff;--text:#0a0a0a;--muted:#5f5f5f;--line:#e2e2e2;--line-strong:#bdbdbd;--soft:#f3f3f3;--accent:#ff6f00;--accent-hover:#e66400;--accent-soft:#fff1e6;--accent-line:#ffc08a;--accent-strong:#c24f00;--radius:20px;--shadow:0 1px 2px rgba(0,0,0,.04),0 10px 30px rgba(0,0,0,.06)}
+*,*::before,*::after{box-sizing:border-box}
+html{scroll-behavior:smooth}
+body{overflow-x:clip;margin:0;background:var(--bg);color:var(--text);font-family:"Heebo",system-ui,-apple-system,"Segoe UI","Arial Hebrew",Arial,sans-serif;font-size:1rem;line-height:1.65}
+a{color:var(--accent-strong)}
+button{font:inherit;color:inherit;cursor:pointer}
+:focus-visible{outline:2px solid var(--accent);outline-offset:2px}
+.wrap{display:grid;grid-template-columns:minmax(0,1fr) 260px;gap:48px;max-width:1120px;margin:0 auto;padding:32px max(16px,env(safe-area-inset-left,0px)) 96px max(16px,env(safe-area-inset-right,0px))}
+header{grid-column:1/-1;padding:24px 0 8px}
+.brand{font-weight:800;font-size:1.25rem;letter-spacing:-.02em}
+h1{margin:12px 0 8px;font-size:clamp(2rem,5vw,3rem);line-height:1.15;font-weight:700;text-wrap:balance}
+h1 .dot{color:var(--accent)}
+.lead{max-width:62ch;margin:0;color:var(--muted);font-size:1.125rem}
+.progress{margin-top:24px;display:flex;align-items:center;gap:16px}
+.bar{flex:1;max-width:420px;height:8px;border-radius:99px;background:var(--soft);overflow:hidden}
+.bar i{display:block;height:100%;width:0;background:var(--accent);transition:width .3s}
+.count{font-size:.875rem;color:var(--muted);font-variant-numeric:tabular-nums}
+main{min-width:0;display:grid;gap:20px}
+nav{position:sticky;top:24px;align-self:start;display:grid;gap:2px;font-size:.9375rem}
+nav a{display:flex;gap:10px;align-items:baseline;padding:8px 12px;border-radius:10px;color:var(--muted);text-decoration:none}
+nav a:hover{background:var(--soft);color:var(--text)}
+nav a.done{color:var(--text)}
+nav a.done::after{content:"\2713";margin-inline-start:auto;color:var(--accent-strong)}
+nav b{min-width:1.4em;font-variant-numeric:tabular-nums;color:var(--accent-strong)}
+.intro,.step{padding:28px;border:1px solid var(--line);border-radius:var(--radius);box-shadow:var(--shadow);background:#fff;min-width:0}
+.step.is-done{border-color:var(--accent-line)}
+.step-head{display:flex;gap:14px;align-items:center;margin-bottom:12px}
+.num{display:grid;place-items:center;flex:none;width:40px;height:32px;border-radius:99px;background:var(--accent-soft);color:var(--accent-strong);font-weight:600;font-variant-numeric:tabular-nums}
+h2{margin:0;font-size:1.5rem;line-height:1.25;font-weight:600}
+h3{margin:20px 0 6px;font-size:.9375rem;font-weight:600;color:var(--muted)}
+p{margin:8px 0}
+ol,ul{margin:8px 0;padding-inline-start:1.4em}
+li{margin:6px 0}
+.ok{margin-top:16px;padding:12px 16px;border-radius:12px;background:var(--accent-soft);border:1px solid var(--accent-line);font-size:.9375rem}
+.ok b{color:var(--accent-strong)}
+.stuck{margin-top:10px;color:var(--muted);font-size:.9375rem}
+.code{position:relative;margin:12px 0;border:1px solid var(--line-strong);border-radius:12px;background:#fff}
+.code pre{margin:0;padding:14px 96px 14px 16px;overflow-x:auto;direction:ltr;text-align:left;font:.875rem/1.6 ui-monospace,SFMono-Regular,Menlo,Consolas,monospace;white-space:pre}
+.code.he .copy{right:auto;left:8px}
+.code.he pre{padding:14px 16px 14px 96px;direction:rtl;text-align:right;white-space:pre-wrap;font-family:"Heebo",system-ui,sans-serif;font-size:.9375rem}
+.copy{position:absolute;top:8px;right:8px;padding:6px 12px;border:1px solid var(--line-strong);border-radius:8px;background:#fff;font-size:.8125rem;font-weight:500}
+.copy:hover{border-color:var(--accent);color:var(--accent-strong)}
+.copy.copied{background:var(--accent);border-color:var(--accent);color:#0a0a0a}
+.check{display:flex;align-items:center;gap:10px;margin-top:20px;padding-top:16px;border-top:1px solid var(--line);cursor:pointer;font-weight:500}
+.check input{width:20px;height:20px;accent-color:var(--accent)}
+table{width:100%;border-collapse:collapse;font-size:.9375rem}
+th,td{padding:10px 12px;border-bottom:1px solid var(--line);text-align:right;vertical-align:top}
+th{color:var(--muted);font-weight:500}
+.table-wrap{overflow-x:auto}
+.note{padding:14px 16px;border:1px solid var(--line-strong);border-radius:12px;font-size:.9375rem}
+footer{grid-column:1/-1;color:var(--muted);font-size:.875rem;padding-top:8px}
+@media(max-width:900px){.wrap{grid-template-columns:minmax(0,1fr);gap:24px}nav{display:none}.intro,.step{padding:20px}}
+@media print{nav,.copy{display:none}.intro,.step{box-shadow:none;break-inside:avoid}}
+@media(prefers-reduced-motion:reduce){html{scroll-behavior:auto}.bar i{transition:none}}
+</style>
+</head>
+<body>
+<div class="wrap">
+<header>
+  <div class="brand">D-ME</div>
+  <h1>מדריך הקמה<span class="dot">.</span></h1>
+  <p class="lead">מאפס לדשבורד שרץ ב-Cloudflare ועונה אוטומטית למי שמגיב באינסטגרם. אפשר ללכת שלב אחרי שלב לבד, או לתת לסוכן AI להוביל.</p>
+  <div class="progress"><div class="bar" aria-hidden="true"><i id="barFill"></i></div><span class="count" id="count">0 מתוך 9 שלבים</span></div>
+</header>
+
+<main>
+<section class="intro" id="start">
+  <h2>הדרך הקלה: סוכן AI מוביל</h2>
+  <p>פותחים את תיקיית הריפו ב-<b>Claude Code</b> או ב-<b>Codex</b>, ואם אפשר מחברים גם <b>Claude בכרום</b>. כותבים לסוכן:</p>
+  <div class="code he"><button class="copy" type="button">העתקה</button><pre>קרא את AGENTS.md והדרך אותי צעד אחר צעד להתקנה של D-ME, מהרגע שאין לי שום חשבון ועד שהדשבורד רץ.</pre></div>
+  <p>הסוכן מוביל בעברית. סיסמאות, קודי אימות, תשלומים וטוקנים מקלידים בעצמך, ולא בצ'אט.</p>
+  <p>המדריך שלמטה מתאר את אותם שלבים, אם מעדיפים ללכת בלי סוכן או לראות מה הולך לקרות.</p>
+</section>
+
+<section class="step" id="s0" data-step="0">
+  <div class="step-head"><span class="num">0</span><h2>בדיקת דרישות</h2></div>
+  <ul>
+    <li>חשבון אינסטגרם <b>מקצועי</b> (עסקי או יוצר). אם הוא אישי: באפליקציה, הגדרות, "סוג חשבון ועבודה", מעבר לחשבון מקצועי.</li>
+    <li>חשבון פייסבוק, לצורך חשבון מפתחים ב-Meta.</li>
+    <li>Node.js 20 ומעלה (גרסת LTS מ-nodejs.org) ו-git.</li>
+  </ul>
+  <div class="code"><button class="copy" type="button">העתקה</button><pre>node -v
+git --version
+npm install
+npm test</pre></div>
+  <div class="ok"><b>איך יודעים שהצליח:</b> <code>npm test</code> עובר בלי שגיאות.</div>
+  <label class="check"><input type="checkbox"> סיימתי את השלב</label>
+</section>
+
+<section class="step" id="s1" data-step="1">
+  <div class="step-head"><span class="num">1</span><h2>חשבון Cloudflare</h2></div>
+  <p>החשבון שבו ירוץ הדשבורד. המסלול החינמי מספיק להתחלה, בלי כרטיס אשראי.</p>
+  <ol>
+    <li>נכנסים ל-<a href="https://dash.cloudflare.com/sign-up" target="_blank" rel="noopener">dash.cloudflare.com/sign-up</a> ונרשמים עם אימייל וסיסמה.</li>
+    <li>מאשרים את האימייל.</li>
+    <li>בתפריט הצד נכנסים ל-<b>Workers &amp; Pages</b>. בפעם הראשונה בוחרים <b>כתובת משנה</b> (<code dir="ltr">&lt;שם&gt;.workers.dev</code>). השם גלוי, ולכן כדאי שם ניטרלי.</li>
+  </ol>
+  <div class="ok"><b>איך יודעים שהצליח:</b> רואים את הלוח של Workers &amp; Pages בלי הודעות חסימה.</div>
+  <label class="check"><input type="checkbox"> סיימתי את השלב</label>
+</section>
+
+<section class="step" id="s2" data-step="2">
+  <div class="step-head"><span class="num">2</span><h2>התחברות של הכלי ל-Cloudflare</h2></div>
+  <p>ככה הכלי <code dir="ltr">wrangler</code> יכול לפעול בחשבון בלי שהסיסמה עוברת דרך אף אחד. נפתח דפדפן, ולוחצים Allow.</p>
+  <div class="code"><button class="copy" type="button">העתקה</button><pre>npx wrangler login
+npx wrangler whoami</pre></div>
+  <div class="ok"><b>איך יודעים שהצליח:</b> <code>whoami</code> מציג את החשבון והאימייל שלך. אם יש כמה חשבונות, מוודאים שזה הנכון.</div>
+  <label class="check"><input type="checkbox"> סיימתי את השלב</label>
+</section>
+
+<section class="step" id="s3" data-step="3">
+  <div class="step-head"><span class="num">3</span><h2>חשבון מפתחים ואפליקציה ב-Meta</h2></div>
+  <p>האפליקציה היא מה שמאשר ל-D-ME לקרוא תגובות ולשלוח הודעות מהחשבון שלך.</p>
+  <ol>
+    <li>נכנסים ל-<a href="https://developers.facebook.com" target="_blank" rel="noopener">developers.facebook.com</a>, מתחברים, ועוברים הרשמה כמפתח (כולל אימות).</li>
+    <li><b>Create App.</b> שם האפליקציה: בלי "Insta", "IG" או "gram" (Meta חוסמת). אימייל קשר: שלך.</li>
+    <li>מוסיפים את המוצר <b>Instagram</b>, ובו <b>API setup with Instagram login</b>. השם עשוי להשתנות.</li>
+    <li><b>Add account:</b> מוסיפים את החשבון המקצועי ומאשרים באינסטגרם. נוצר <b>Instagram account ID</b> מספרי. רושמים אותו, הוא לא סוד.</li>
+    <li><b>Generate token</b> לחשבון (תוקף של כ-60 יום). שומרים בצד. <b>לא מדביקים בצ'אט.</b></li>
+    <li>באותו מסך מוצאים את ה-<b>Instagram app secret</b>, ושומרים בצד.</li>
+    <li>ההרשאות: <code dir="ltr">instagram_business_basic</code>, <code dir="ltr">instagram_business_manage_comments</code>, <code dir="ltr">instagram_business_manage_messages</code>. מאשרים את כולן.</li>
+  </ol>
+  <div class="ok"><b>איך יודעים שהצליח:</b> ידועים לך ה-Instagram account ID, הטוקן וה-app secret.</div>
+  <p class="stuck">אם האפשרות לא מופיעה: מחפשים בתפריט Products. Meta משנה מסכים לעיתים, והעיקרון נשאר זהה.</p>
+  <label class="check"><input type="checkbox"> סיימתי את השלב</label>
+</section>
+
+<section class="step" id="s4" data-step="4">
+  <div class="step-head"><span class="num">4</span><h2>ההתקנה</h2></div>
+  <p>מריצים <b>בטרמינל שלך</b>. הסקריפט יוצר מסד נתונים, מפעיל מיגרציות, שומר את הסודות ב-Cloudflare ופורס. הוא שואל בהזנה מוסתרת את הטוקן ואת ה-app secret.</p>
+  <div class="code"><button class="copy" type="button">העתקה</button><pre>npm run setup -- --apply --instagram-user-id &lt;ה-Instagram account ID&gt;</pre></div>
+  <ol>
+    <li>הסקריפט מציג את חשבון ה-Cloudflare. מקלידים <code>yes</code> אם זה הנכון.</li>
+    <li>מקלידים את הטוקן ואת ה-app secret כשנשאל (לא רואים אותם בזמן ההקלדה, וזה תקין).</li>
+    <li>בסוף מוצגות כתובת הדשבורד וכתובת ה-webhook.</li>
+    <li>הסיסמה וה-Verify token נשמרים בקובץ <code dir="ltr">d-me-tokens.txt</code>. פותחים אותו בעצמך, מעתיקים למנהל סיסמאות, ומוחקים אותו.</li>
+  </ol>
+  <div class="ok"><b>איך יודעים שהצליח:</b> <code dir="ltr">/health</code> בכתובת שלך מחזיר <code dir="ltr">{"ok":true}</code>. הסקריפט בודק זאת בעצמו.</div>
+  <p class="stuck">נתקע? Cloudflare לא מחובר: חוזרים לשלב 2. אין כתובת workers.dev: חוזרים לשלב 1. הפריסה נכשלה אחרי יצירת המסד: לא מריצים הכול מחדש, אלא בודקים בלוח (Storage &amp; Databases, D1) ומריצים <code>npm run deploy</code>.</p>
+  <label class="check"><input type="checkbox"> סיימתי את השלב</label>
+</section>
+
+<section class="step" id="s5" data-step="5">
+  <div class="step-head"><span class="num">5</span><h2>חיבור ה-webhook ב-Meta</h2></div>
+  <p>ככה האינסטגרם שולחת ל-D-ME כל תגובה והודעה חדשה.</p>
+  <ol>
+    <li>באפליקציה ב-Meta, באותו מסך API setup, בחלק <b>Configure webhooks</b>.</li>
+    <li><b>Callback URL:</b> כתובת ה-webhook משלב 4 (נגמרת ב-<code dir="ltr">/webhook/instagram</code>).</li>
+    <li><b>Verify token:</b> הערך מהקובץ <code dir="ltr">d-me-tokens.txt</code>. לוחצים <b>Verify and save</b>.</li>
+    <li>מסמנים את האירועים <b>comments</b> ו-<b>messages</b>, ומאפשרים מנוי לחשבון.</li>
+  </ol>
+  <div class="ok"><b>איך יודעים שהצליח:</b> Meta מאשרת את ה-Callback בלי שגיאה.</div>
+  <p class="stuck">Meta לא מאשרת: בודקים שה-Verify token והכתובת תואמים. אם אחר כך אירועים מקבלים 401: ה-app secret שהוזן אינו זה ש-Meta חותמת איתו. מנסים את ה-App secret של האפליקציה (App settings, Basic) ומחליפים:</p>
+  <div class="code"><button class="copy" type="button">העתקה</button><pre>npx wrangler secret put IG_APP_SECRET --config wrangler.local.jsonc</pre></div>
+  <label class="check"><input type="checkbox"> סיימתי את השלב</label>
+</section>
+
+<section class="step" id="s6" data-step="6">
+  <div class="step-head"><span class="num">6</span><h2>הדשבורד והאוטומציה הראשונה</h2></div>
+  <ol>
+    <li>פותחים את <code dir="ltr">&lt;הכתובת שלך&gt;/admin</code>. בשדה "מפתח ניהול" מזינים את הסיסמה מ-<code dir="ltr">d-me-tokens.txt</code> ולוחצים חיבור.</li>
+    <li>בוחרים תוכן: <b>פוסט</b>, <b>ריל</b> או <b>סטורי</b>. אפשר לבחור כמה, או "כל הפוסטים".</li>
+    <li>כותבים מילות תגובה (למשל "לינק"), את הלינק והודעה פרטית, ובוחרים אם לשלוח רק לעוקבים.</li>
+    <li>שומרים. האוטומציה מופיעה ב"רצות עכשיו" בסיידבר, והקוביות מציגות את הספירות.</li>
+  </ol>
+  <div class="ok"><b>איך יודעים שהצליח:</b> האוטומציה פעילה ברשימה, והפוסטים שלך נטענו.</div>
+  <label class="check"><input type="checkbox"> סיימתי את השלב</label>
+</section>
+
+<section class="step" id="s7" data-step="7">
+  <div class="step-head"><span class="num">7</span><h2>בדיקת קבלה אמיתית</h2></div>
+  <div class="note"><b>חשוב:</b> כל עוד האפליקציה ב-Meta במצב Development, אירועים מגיעים רק מחשבונות שיש להם תפקיד באפליקציה. לכן בודקים קודם מחשבון בודק: ב-Meta, App roles, מוסיפים חשבון אינסטגרם שני כ-<b>Instagram Tester</b>, והוא מאשר את ההזמנה בהגדרות האינסטגרם שלו.</div>
+  <ol>
+    <li>מהחשבון הבודק מגיבים על הפוסט במילת הטריגר.</li>
+    <li>ההודעה הפרטית מגיעה <b>פעם אחת בלבד</b>.</li>
+    <li>אם הוגדרה בדיקת עוקב: חשבון שלא עוקב מקבל בקשה עם כפתור, ורק אחרי שעקב ולחץ מקבל את הלינק.</li>
+    <li>אם הוגדרה אוטומציה לסטורי: בודקים גם תגובה לסטורי.</li>
+    <li>לוגים: בלוח של Cloudflare, Workers &amp; Pages, ה-Worker, Observability.</li>
+  </ol>
+  <p><b>כדי שגולשים רגילים יפעילו את האוטומציה:</b> האפליקציה צריכה להיות במצב <b>Live</b>, ולעיתים נדרש <b>App Review</b> להרשאות ההודעות וה-comments, כולל כתובת מדיניות פרטיות. הדרישות של Meta משתנות, ולכן בודקים בתיעוד הרשמי שלהם בזמן ההקמה.</p>
+  <div class="ok"><b>ההקמה גמורה</b> רק אחרי שבדיקה מחשבון בודק עברה.</div>
+  <label class="check"><input type="checkbox"> סיימתי את השלב</label>
+</section>
+
+<section class="step" id="s8" data-step="8">
+  <div class="step-head"><span class="num">8</span><h2>תחזוקה</h2></div>
+  <h3>חידוש הטוקן, כל כ-50 יום</h3>
+  <p>הטוקן של אינסטגרם פג אחרי כ-60 יום. מרעננים כשבועיים לפני, ומוסיפים תזכורת ביומן. קריאה אחת מחזירה טוקן חדש:</p>
+  <div class="code"><button class="copy" type="button">העתקה</button><pre>https://graph.instagram.com/refresh_access_token?grant_type=ig_refresh_token&amp;access_token=&lt;הטוקן הנוכחי&gt;</pre></div>
+  <p>ואז שומרים אותו (מקלידים בהזנה מוסתרת):</p>
+  <div class="code"><button class="copy" type="button">העתקה</button><pre>npx wrangler secret put IG_ACCESS_TOKEN --config wrangler.local.jsonc</pre></div>
+  <h3>החלפת סיסמת הניהול</h3>
+  <div class="code"><button class="copy" type="button">העתקה</button><pre>npx wrangler secret put ADMIN_TOKEN --config wrangler.local.jsonc</pre></div>
+  <h3>עדכון גרסה</h3>
+  <div class="code"><button class="copy" type="button">העתקה</button><pre>git pull
+npm test
+npm run deploy</pre></div>
+  <h3>תקלות נפוצות</h3>
+  <div class="table-wrap"><table>
+    <thead><tr><th>תופעה</th><th>סיבה נפוצה</th><th>מה עושים</th></tr></thead>
+    <tbody>
+      <tr><td><code dir="ltr">/health</code> לא עונה</td><td>הפריסה לא הסתיימה</td><td>מחכים דקה, בודקים ב-Workers &amp; Pages</td></tr>
+      <tr><td>כניסה לדשבורד נכשלת</td><td>סיסמה לא נכונה</td><td>מחליפים ADMIN_TOKEN</td></tr>
+      <tr><td>הפוסטים לא נטענים</td><td>טוקן לא נכון או פג, או חסרה הרשאה</td><td>מייצרים טוקן חדש ומזינים שוב</td></tr>
+      <tr><td>Webhook מחזיר 401</td><td>app secret לא תואם</td><td>ראו שלב 5</td></tr>
+      <tr><td>אין אירועים מגולשים</td><td>האפליקציה ב-Development</td><td>שלב 7, מצב Live ו-App Review</td></tr>
+      <tr><td>הודעה כפולה</td><td>אירוע חוזר מ-Meta</td><td>המערכת מונעת כפילויות לפי מזהה. בודקים בלוגים</td></tr>
+    </tbody>
+  </table></div>
+  <label class="check"><input type="checkbox"> סיימתי את השלב</label>
+</section>
+</main>
+
+<nav aria-label="שלבים" id="nav"></nav>
+<footer>הפרטים המלאים לסוכן נמצאים ב-<a href="AGENT_PLAYBOOK_HE.md">AGENT_PLAYBOOK_HE.md</a>. הפונט Heebo ברישיון SIL Open Font License.</footer>
+</div>
+<script>
+(function(){
+  'use strict';
+  var KEY='dme-guide-progress';
+  var steps=[].slice.call(document.querySelectorAll('.step'));
+  var nav=document.getElementById('nav');
+  var titles=steps.map(function(s){return s.querySelector('h2').textContent});
+  var saved={};
+  try{saved=JSON.parse(localStorage.getItem(KEY)||'{}')}catch(e){saved={}}
+  function save(){try{localStorage.setItem(KEY,JSON.stringify(saved))}catch(e){}}
+  steps.forEach(function(step,i){
+    var link=document.createElement('a');link.href='#'+step.id;link.dataset.for=step.id;
+    link.innerHTML='<b>'+i+'</b><span></span>';link.lastChild.textContent=titles[i];nav.appendChild(link);
+    var box=step.querySelector('.check input');
+    box.id='done-'+i;box.checked=!!saved[step.id];
+    box.addEventListener('change',function(){saved[step.id]=box.checked;save();refresh()});
+  });
+  function refresh(){
+    var done=0;
+    steps.forEach(function(step){
+      var on=!!saved[step.id];if(on)done+=1;
+      step.classList.toggle('is-done',on);
+      var l=nav.querySelector('[data-for="'+step.id+'"]');if(l)l.classList.toggle('done',on);
+    });
+    document.getElementById('barFill').style.width=(done/steps.length*100)+'%';
+    document.getElementById('count').textContent=done+' מתוך '+steps.length+' שלבים';
+  }
+  refresh();
+  function fallbackCopy(text){var t=document.createElement('textarea');t.value=text;t.style.position='fixed';t.style.opacity='0';document.body.appendChild(t);t.select();var ok=false;try{ok=document.execCommand('copy')}catch(e){}document.body.removeChild(t);return ok}
+  document.querySelectorAll('.copy').forEach(function(btn){
+    btn.addEventListener('click',function(){
+      var text=btn.parentNode.querySelector('pre').innerText;
+      function done(ok){btn.textContent=ok?'הועתק':'סמנו והעתיקו';btn.classList.toggle('copied',ok);setTimeout(function(){btn.textContent='העתקה';btn.classList.remove('copied')},1800)}
+      if(navigator.clipboard&&navigator.clipboard.writeText){navigator.clipboard.writeText(text).then(function(){done(true)},function(){done(fallbackCopy(text))})}
+      else{done(fallbackCopy(text))}
+    });
+  });
+})();
+</script>
+</body>
+</html>
