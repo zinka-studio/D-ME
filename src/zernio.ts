@@ -228,8 +228,6 @@ async function readStatus(env: Env) {
     providers: [
       { id: "zernio", name: "Zernio", role: "מנוע האוטומציות והתזמון", connected: accountResult.status === "fulfilled",
         detail: accountResult.status === "fulfilled" ? "מחובר" : "לא נמצא חשבון אינסטגרם מחובר" },
-      { id: "composio", name: "Composio", role: "פרסום ישיר דרך Composio", connected: false,
-        detail: "לא מחובר לדשבורד. תזמון דרך Composio לא נתמך כאן עדיין" },
     ],
     plan: usage ? {
       name: body.planName ?? null, period: body.billingPeriod ?? null, billing: body.billingSystem ?? null,

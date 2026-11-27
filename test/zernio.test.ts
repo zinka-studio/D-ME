@@ -79,7 +79,7 @@ describe("Zernio mode", () => {
     const response = await handleZernioAdmin(new Request(url, { headers: auth }), env, url);
     const payload = await response.json<{ providers: Array<{ id: string; connected: boolean }>; plan: { name: string; usage: { uploads: number } } }>();
     expect(payload.providers.find((p) => p.id === "zernio")?.connected).toBe(true);
-    expect(payload.providers.find((p) => p.id === "composio")?.connected).toBe(false);
+    expect(payload.providers).toHaveLength(1);
     expect(payload.plan.name).toBe("Hobby");
     expect(payload.plan.usage.uploads).toBe(40);
   });
