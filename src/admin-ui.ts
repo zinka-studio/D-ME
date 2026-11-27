@@ -133,9 +133,6 @@ const HTML = `<!doctype html>
                 <label class="field"><span>הודעה פרטית</span><textarea id="messageTemplate" maxlength="1000" rows="4">היי {{username}}, הנה הלינק שביקשת</textarea></label>
                 <label class="field"><span>לינק <small>נשלח ככפתור בהודעה</small></span><input id="targetUrl" type="url" placeholder="https://..." dir="ltr"></label>
               </div>`)}
-        </div>
-
-        <aside class="side-col">
           <section class="hero" aria-labelledby="heroTitle">
             <h3 id="heroTitle">סיכום לפני שמירה</h3>
             <div class="kpis" id="heroKpis" hidden>
@@ -154,6 +151,10 @@ const HTML = `<!doctype html>
             <button class="btn blue wide" id="publishButton" type="submit" hidden>תזמון הפוסט ←</button>
             <button class="text-button" id="resetButton" type="button" hidden>ביטול העריכה</button>
           </section>
+        </div>
+
+        <aside class="side-col">
+
 
           <section class="phone" aria-label="תצוגה מקדימה">
             <div class="phone-head"><span class="avatar" id="previewAvatar"></span><b id="previewUsername">your_account</b></div>
@@ -330,7 +331,7 @@ input:focus-visible+.switch{outline:3px solid var(--cobalt);outline-offset:2px}
 #gateFields.disabled{opacity:.45;pointer-events:none}
 .public-off{opacity:.5}
 
-.side-col{position:sticky;top:24px;display:grid;gap:var(--gap);min-width:0}
+.side-col{position:sticky;top:24px;max-height:calc(100vh - 48px);overflow-y:auto;display:grid;gap:var(--gap);min-width:0}
 .hero,.phone{min-width:0}
 .hero{display:grid;gap:12px;padding:18px;background:var(--tomato);border:var(--bw) solid var(--ink);border-radius:var(--r-card);box-shadow:var(--shadow)}
 .hero h3{margin:0;font-size:var(--fs-lg)}
@@ -352,7 +353,7 @@ input:focus-visible+.switch{outline:3px solid var(--cobalt);outline-offset:2px}
 .actions{display:grid;grid-template-columns:1fr 1fr;gap:12px}
 .hero .text-button{justify-self:start;color:var(--ink)}
 
-.phone{padding:18px;background:var(--surface);border:var(--bw) solid var(--ink);border-radius:var(--r-card);box-shadow:var(--shadow)}
+.phone{padding:16px;background:var(--surface);border:var(--bw) solid var(--ink);border-radius:var(--r-card);box-shadow:var(--shadow)}
 .phone-head{display:flex;align-items:center;gap:10px;font-size:var(--fs-sm)}
 .phone-head .avatar{width:36px;height:36px}
 .phone-media{display:grid;place-items:center;margin:12px 0;aspect-ratio:1;overflow:hidden;border:var(--bw) solid var(--ink);border-radius:var(--r-inner);background:var(--surface-2);font-size:40px}
