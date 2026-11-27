@@ -73,6 +73,17 @@ describe("Zernio mode", () => {
     expect(response.status).toBe(401);
   });
 
+  it("reports connections, plan usage and what is left", async () => {
+    stubZernio({ "/accounts?platform": accounts, "/usage": { planName: "Hobby", billingPeriod: "monthly", limits: { uploads: 100 }, usage: { uploads: 40 } } });
+    const url = new URL("https://w.test/api/status");
+    const response = await handleZernioAdmin(new Request(url, { headers: auth }), env, url);
+    const payload = await response.json<{ providers: Array<{ id: string; connected: boolean }>; plan: { name: string; usage: { uploads: number } } }>();
+    expect(payload.providers.find((p) => p.id === "zernio")?.connected).toBe(true);
+    expect(payload.providers.find((p) => p.id === "composio")?.connected).toBe(false);
+    expect(payload.plan.name).toBe("Hobby");
+    expect(payload.plan.usage.uploads).toBe(40);
+  });
+
   it("lists automations for the connected account's profile", async () => {
     const calls = stubZernio({ "/accounts?platform": accounts, "/comment-automations": { automations: [{ id: "a1", keywords: ["x"], isActive: true }] } });
     const url = new URL("https://w.test/api/automations");

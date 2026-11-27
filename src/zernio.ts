@@ -206,10 +206,46 @@ async function isAuthorized(request: Request, env: Env): Promise<boolean> {
   return secureStringEqual(supplied, env.ADMIN_TOKEN);
 }
 
+/** What is connected, and how much of the month is left (plan, usage, request rate limit). */
+async function readStatus(env: Env) {
+  const headers = { Authorization: `Bearer ${env.ZERNIO_API_KEY}` };
+  const [accountResult, usageResult] = await Promise.allSettled([
+    resolveAccount(env),
+    fetch(`${ZERNIO_BASE}/usage`, { headers }).then(async (response) => ({
+      ok: response.ok,
+      status: response.status,
+      body: await response.json().catch(() => ({})) as Record<string, unknown>,
+      rate: {
+        limit: Number(response.headers.get("X-RateLimit-Limit")) || null,
+        remaining: Number(response.headers.get("X-RateLimit-Remaining")) || null,
+        reset: Number(response.headers.get("X-RateLimit-Reset")) || null,
+      },
+    })),
+  ]);
+  const usage = usageResult.status === "fulfilled" && usageResult.value.ok ? usageResult.value : null;
+  const body = (usage?.body ?? {}) as { planName?: string; billingPeriod?: string; billingSystem?: string; limits?: Record<string, number>; usage?: Record<string, unknown>; spend?: Record<string, number> };
+  return {
+    providers: [
+      { id: "zernio", name: "Zernio", role: "מנוע האוטומציות והתזמון", connected: accountResult.status === "fulfilled",
+        detail: accountResult.status === "fulfilled" ? "מחובר" : "לא נמצא חשבון אינסטגרם מחובר" },
+      { id: "composio", name: "Composio", role: "פרסום ישיר דרך Composio", connected: false,
+        detail: "לא מחובר לדשבורד. תזמון דרך Composio לא נתמך כאן עדיין" },
+    ],
+    plan: usage ? {
+      name: body.planName ?? null, period: body.billingPeriod ?? null, billing: body.billingSystem ?? null,
+      limits: body.limits ?? {}, usage: body.usage ?? {}, spend: body.spend ?? null,
+    } : null,
+    rateLimit: usage?.rate ?? null,
+    usageError: usage ? null : "לא ניתן לקרוא את נתוני השימוש מ-Zernio",
+  };
+}
+
 export async function handleZernioAdmin(request: Request, env: Env, url: URL): Promise<Response> {
   if (!await isAuthorized(request, env)) return json({ error: "Unauthorized" }, 401);
   if (!zernioEnabled(env)) return json({ error: "ZERNIO_API_KEY is not set on this Worker. Run: npm run setup -- --apply" }, 503);
   try {
+    if (request.method === "GET" && url.pathname === "/api/status") return json(await readStatus(env));
+
     if (request.method === "GET" && url.pathname === "/api/automations") {
       const { profileId } = await resolveAccount(env);
       const payload = await zernio<{ automations?: ZernioAutomation[] }>(env, `/comment-automations?profileId=${encodeURIComponent(profileId)}`);
