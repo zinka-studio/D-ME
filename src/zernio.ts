@@ -57,11 +57,14 @@ async function zernio<T>(env: Env, path: string, init: RequestInit = {}): Promis
   return payload as T;
 }
 
-interface ZernioAccount { _id?: string; id?: string; platform?: string; username?: string; profileId?: string | { _id?: string; id?: string } }
+interface ZernioAccount { _id?: string; id?: string; platform?: string; username?: string; displayName?: string; profilePicture?: string | null; profileId?: string | { _id?: string; id?: string } }
 
-let cachedAccount: { accountId: string; profileId: string } | null = null;
 
-async function resolveAccount(env: Env): Promise<{ accountId: string; profileId: string }> {
+
+type ResolvedAccount = { accountId: string; profileId: string; username?: string; profilePicture?: string | null };
+let cachedAccount: ResolvedAccount | null = null;
+
+async function resolveAccount(env: Env): Promise<ResolvedAccount> {
   const e = env as ZernioEnv;
   if (e.ZERNIO_ACCOUNT_ID && e.ZERNIO_PROFILE_ID) return { accountId: e.ZERNIO_ACCOUNT_ID, profileId: e.ZERNIO_PROFILE_ID };
   if (cachedAccount) return cachedAccount;
@@ -75,7 +78,7 @@ async function resolveAccount(env: Env): Promise<{ accountId: string; profileId:
   const profileId = typeof profile === "string" ? profile : profile?._id ?? profile?.id ?? e.ZERNIO_PROFILE_ID ?? "";
   const accountId = chosen._id ?? chosen.id ?? "";
   if (!accountId || !profileId) throw new ZernioError("Zernio did not return an account or profile id.", 502);
-  cachedAccount = { accountId, profileId };
+  cachedAccount = { accountId, profileId, username: chosen.username, profilePicture: chosen.profilePicture ?? null };
   return cachedAccount;
 }
 
@@ -243,6 +246,11 @@ export async function handleZernioAdmin(request: Request, env: Env, url: URL): P
   if (!await isAuthorized(request, env)) return json({ error: "Unauthorized" }, 401);
   if (!zernioEnabled(env)) return json({ error: "ZERNIO_API_KEY is not set on this Worker. Run: npm run setup -- --apply" }, 503);
   try {
+    if (request.method === "GET" && url.pathname === "/api/instagram/profile") {
+      const account = await resolveAccount(env);
+      return json({ profile: { username: account.username ?? "", profilePictureUrl: account.profilePicture ?? null } });
+    }
+
     if (request.method === "GET" && url.pathname === "/api/status") return json(await readStatus(env));
 
     if (request.method === "GET" && url.pathname === "/api/automations") {

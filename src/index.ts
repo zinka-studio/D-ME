@@ -28,7 +28,7 @@ export default {
       if (request.method === "GET" && url.pathname === "/health") {
         return json({ ok: true, service: "d-me", environment: env.ENVIRONMENT });
       }
-      if (url.pathname.startsWith("/api/automations") || url.pathname === "/api/instagram/media" || url.pathname === "/api/status") {
+      if (url.pathname.startsWith("/api/automations") || url.pathname === "/api/instagram/media" || url.pathname === "/api/status" || url.pathname === "/api/instagram/profile") {
         return handleZernioAdmin(request, env, url);
       }
       return json({ error: "Not found" }, 404);
