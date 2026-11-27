@@ -1,4 +1,5 @@
 import { handleAdminRequest } from "./admin";
+import { handleZernioAdmin, zernioEnabled } from "./zernio";
 import { handleAdminUi } from "./admin-ui";
 import { processWebhookPayload } from "./processor";
 import { secureStringEqual, verifyMetaSignature } from "./security";
@@ -63,7 +64,7 @@ export default {
         return receiveWebhook(request, env, ctx);
       }
       if (url.pathname.startsWith("/api/automations") || url.pathname === "/api/instagram/media") {
-        return handleAdminRequest(request, env, url);
+        return zernioEnabled(env) ? handleZernioAdmin(request, env, url) : handleAdminRequest(request, env, url);
       }
       return json({ error: "Not found" }, 404);
     } catch (error) {

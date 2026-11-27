@@ -6,7 +6,7 @@
 //   node scripts/setup.mjs --apply         create everything (run it in your own terminal)
 //
 // Options: --name <worker-name> --instagram-user-id <digits> --location <weur|eeur|apac|oc|wnam|enam>
-//          --skip-tests --yes
+//          --zernio (Zernio mode: no Meta app, no database) --skip-tests --yes
 //
 // Secrets are typed into hidden prompts (or read from DME_IG_ACCESS_TOKEN and DME_IG_APP_SECRET).
 // The generated verify and admin tokens are written to d-me-tokens.txt, never printed.
@@ -32,6 +32,7 @@ function parseArgs(argv) {
     if (arg === "--apply") args.apply = true;
     else if (arg === "--skip-tests") args.skipTests = true;
     else if (arg === "--yes") args.yes = true;
+    else if (arg === "--zernio") args.zernio = true;
     else if (arg === "--name") args.name = argv[++i];
     else if (arg === "--instagram-user-id") args.instagramUserId = argv[++i];
     else if (arg === "--location") args.location = argv[++i];
@@ -141,6 +142,55 @@ async function subscribeAccount(host, accessToken, instagramUserId, version) {
   return response.ok ? { ok: true } : { ok: false, message: body?.error?.message ?? String(response.status) };
 }
 
+// Zernio mode: Zernio holds the Instagram connection and runs the automations, so the Worker only
+// serves the dashboard. No Meta app, no D1 database, no webhook.
+async function installZernio({ workerName, args }) {
+  console.log("\nEnter your Zernio API key (zernio.com/dashboard/api-keys). Input is hidden and is never saved to a file in this folder.");
+  const apiKey = process.env.DME_ZERNIO_API_KEY || await askHidden("Zernio API key: ");
+  if (!apiKey) throw new Error("The Zernio API key is required.");
+  console.log("\n[Checking the key with Zernio]");
+  const response = await fetch("https://zernio.com/api/v1/accounts?platform=instagram", { headers: { Authorization: `Bearer ${apiKey}` } });
+  const body = await response.json().catch(() => ({}));
+  if (!response.ok) throw new Error(`Zernio did not accept this key (${body?.error?.message ?? body?.error ?? response.status}). Nothing was created.`);
+  const instagram = (body.accounts ?? []).filter((account) => !account.platform || account.platform === "instagram");
+  if (!instagram.length) throw new Error("The key works, but no Instagram account is connected in Zernio. Connect one in the Zernio dashboard, then run this again. Nothing was created.");
+  console.log(`Key accepted. Instagram account: @${instagram[0].username ?? instagram[0]._id}${instagram.length > 1 ? ` (and ${instagram.length - 1} more; the dashboard uses the first)` : ""}.`);
+
+  if (!args.skipTests) await run("Tests", isWindows ? "npm.cmd" : "npm", ["test"]);
+  const config = JSON.parse(readFileSync(join(root, "wrangler.jsonc"), "utf8"));
+  config.name = workerName;
+  delete config.d1_databases;
+  delete config.vars.IG_USER_ID;
+  writeFileSync(localConfig, `${JSON.stringify(config, null, 2)}\n`);
+  await wrangler("Dry deployment", ["deploy", "--dry-run", "--config", localConfig]);
+
+  const adminToken = token();
+  const secretsDir = mkdtempSync(join(tmpdir(), "d-me-"));
+  const secretsFile = join(secretsDir, "secrets.json");
+  let deployOutput;
+  try {
+    writeFileSync(secretsFile, JSON.stringify({ ZERNIO_API_KEY: apiKey, ADMIN_TOKEN: adminToken }), { mode: 0o600 });
+    deployOutput = await wrangler("Deploy", ["deploy", "--config", localConfig, "--secrets-file", secretsFile, "--message", "D-ME install (Zernio mode)"]);
+  } finally {
+    rmSync(secretsDir, { recursive: true, force: true });
+  }
+  const urlMatch = /https:\/\/[^\s]+\.workers\.dev/.exec(deployOutput);
+  if (!urlMatch) throw new Error("Deployed, but the workers.dev address was not found in the output. Open the Worker in the Cloudflare dashboard to get it.");
+  const workerUrl = urlMatch[0].replace(/\/$/, "");
+  const health = await fetch(`${workerUrl}/health`).then((r) => r.json()).catch(() => null);
+  if (!health || health.ok !== true) throw new Error(`The Worker is deployed at ${workerUrl} but /health did not answer ok. Wait a minute and open it again.`);
+
+  writeFileSync(tokensPath, [
+    "D-ME private token. Move it to a password manager, then delete this file.",
+    `Admin password (the "management key" in the dashboard): ${adminToken}`,
+    "",
+  ].join("\n"), { mode: 0o600 });
+  writeFileSync(manifestPath, `${JSON.stringify({ mode: "zernio", workerName, workerUrl, adminUrl: `${workerUrl}/admin`, createdAt: new Date().toISOString() }, null, 2)}\n`);
+  console.log("\nInstalled and health-checked (Zernio mode).");
+  console.log(`Dashboard: ${workerUrl}/admin`);
+  console.log(`\nThe admin password is in ${tokensPath}. Open that file yourself, copy it to a password manager, then delete it. It is not printed here on purpose.`);
+}
+
 async function main() {
   const args = parseArgs(process.argv.slice(2));
   if (args.help) {
@@ -155,6 +205,7 @@ async function main() {
   let instagramUserId = args.instagramUserId ?? "";
   const location = args.location ?? "weur";
   if (!/^[a-z0-9](?:[a-z0-9-]{0,38}[a-z0-9])?$/.test(workerName)) throw new Error("--name must be lowercase letters, digits and hyphens.");
+  if (args.zernio) instagramUserId = "";
   if (instagramUserId && !/^[0-9]+$/.test(instagramUserId)) throw new Error("--instagram-user-id must be the numeric Instagram account ID.");
   if (!["weur", "eeur", "apac", "oc", "wnam", "enam"].includes(location)) throw new Error("--location must be one of weur, eeur, apac, oc, wnam, enam.");
   const databaseName = `${workerName}-db`;
@@ -180,6 +231,7 @@ async function main() {
     const answer = await ask("\nIs this the Cloudflare account you want to install into? Type yes to continue: ");
     if (answer.toLowerCase() !== "yes") { console.log("Stopped. Nothing was changed."); return; }
   }
+  if (args.zernio) { await installZernio({ workerName, args }); return; }
   console.log("\nEnter the Meta credentials. Input is hidden and is never saved to a file in this folder.");
   const accessToken = process.env.DME_IG_ACCESS_TOKEN || await askHidden("Instagram access token: ");
   const appSecret = process.env.DME_IG_APP_SECRET || await askHidden("Meta app secret: ");
