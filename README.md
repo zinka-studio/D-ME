@@ -41,7 +41,7 @@
 ## התקנה ידנית, בקצרה
 
 ```bash
-npm install
+npm ci
 npx wrangler login
 npm run setup -- --apply
 ```

@@ -91,7 +91,7 @@ footer{grid-column:1/-1;color:var(--muted);font-size:.875rem;padding-top:8px}
   </ul>
   <div class="code"><button class="copy" type="button">העתקה</button><pre>node -v
 git --version
-npm install
+npm ci
 npm test</pre></div>
   <div class="ok"><b>איך יודעים שהצליח:</b> <code>npm test</code> עובר בלי שגיאות.</div>
   <label class="check"><input type="checkbox"> סיימתי את השלב</label>
@@ -121,19 +121,18 @@ npx wrangler whoami</pre></div>
 <section class="step" id="s3" data-step="3">
   <div class="step-head"><span class="num">3</span><h2>חשבון מפתחים ואפליקציה ב-Meta</h2></div>
   <p>האפליקציה היא מה שמאשר ל-D-ME לקרוא תגובות ולשלוח הודעות מהחשבון שלך.</p>
-  <div class="note"><b>שינוי של Meta (אוקטובר 2026):</b> אפליקציות חדשות כבר לא מציעות "Instagram login" הישן, אלא <b>Unified Login</b>, דרך Business Portfolio. אפליקציה ישנה שכבר קיימת אצלך ב-My Apps ממשיכה לעבוד. אין צורך לדעת איזו דרך יש לך: ההתקנה בשלב 4 בודקת בעצמה מול Meta מה עובד.</div>
+  <div class="note"><b>שינוי של Meta (אוקטובר 2026):</b> אפליקציות חדשות עובדות עם <b>Unified login</b> ולא עם "Instagram login" הישן. תראו בדף ה-use case את ההודעה "API setup with Instagram login is not available for newer apps". ההרשאות נקראות <code dir="ltr">instagram_basic</code>, <code dir="ltr">instagram_manage_comments</code>, <code dir="ltr">instagram_manage_messages</code>, והטוקן הוא של <b>משתמש מערכת</b> בתוך Business Portfolio. ההתקנה בשלב 4 בודקת בעצמה מול Meta מה עובד.</div>
   <ol>
     <li>נכנסים ל-<a href="https://developers.facebook.com" target="_blank" rel="noopener">developers.facebook.com</a>, מתחברים, ועוברים הרשמה כמפתח (כולל אימות).</li>
-    <li>יש כבר אפליקציה ב-My Apps עם Instagram login? אפשר להשתמש בה ולדלג לשלב 5 שבהמשך הרשימה. אחרת <b>Create App</b>.</li>
+    <li>יש כבר אפליקציה ישנה עם Instagram login ב-My Apps? אפשר להשתמש בה. אחרת <b>Create App</b>, use case: <b>Manage messaging &amp; content on Instagram</b>.</li>
     <li>שם האפליקציה: בלי "Insta", "IG" או "gram" (Meta חוסמת). אימייל קשר: שלך.</li>
-    <li>Meta עשויה לדרוש <b>Business Portfolio</b> (אפשר ליצור אחד בחינם). מוסיפים את המוצר <b>Instagram</b>.</li>
-    <li>בלוח האפליקציה: <b>Instagram &gt; API setup</b> (השם משתנה, למשל "API setup with Instagram business login"). <b>Add account</b> לחשבון המקצועי והתחברות עם אינסטגרם. נוצר <b>Instagram account ID</b> מספרי. רושמים אותו, הוא לא סוד.</li>
-    <li><b>Generate token</b> לחשבון. רושמים בצד את התוקף שמוצג (בדרך כלל כ-60 יום). שומרים את הטוקן בצד. <b>לא מדביקים בצ'אט.</b></li>
-    <li>את ה-<b>App secret</b> מוצאים ב-App settings &gt; Basic (ולעיתים גם באותו מסך). שומרים בצד.</li>
-    <li>ההרשאות: <code dir="ltr">instagram_business_basic</code>, <code dir="ltr">instagram_business_manage_comments</code>, <code dir="ltr">instagram_business_manage_messages</code>. בגרסת Unified Login הן עשויות להופיע בלי "business" (למשל <code dir="ltr">instagram_manage_comments</code>). מאשרים את כולן.</li>
+    <li>חיבור <b>Business Portfolio</b> (אפשר ליצור אחד בחינם). לעיתים מופיעה פעם אחת "Verification Required", ובניסיון נוסף זה מצליח.</li>
+    <li>את ה-<b>App secret</b> מוצאים ב-App settings &gt; Basic. שומרים בצד.</li>
+    <li><b>טוקן:</b> ב-<a href="https://business.facebook.com/settings" target="_blank" rel="noopener">Meta Business Settings</a> של אותו Portfolio: Users &gt; System users &gt; Add (Admin). מוסיפים לו נכסים: את האפליקציה ואת חשבון האינסטגרם. אחר כך <b>Generate new token</b>: בוחרים את האפליקציה, תוקף (עדיף "Never" אם יש), וההרשאות <code dir="ltr">instagram_basic</code>, <code dir="ltr">instagram_manage_comments</code>, <code dir="ltr">instagram_manage_messages</code>. שומרים את הטוקן בצד. <b>לא מדביקים בצ'אט.</b></li>
+    <li>רושמים את ה-<b>Instagram account ID</b> המספרי של החשבון המקצועי (לא סוד).</li>
   </ol>
   <div class="ok"><b>איך יודעים שהצליח:</b> ידועים לך ה-Instagram account ID, הטוקן (ותוקפו) וה-app secret.</div>
-  <p class="stuck">אם האפשרות לא מופיעה: מחפשים בתפריט Products. Meta לא נותנת ליצור טוקן: ודאו שהחשבון מקצועי וציבורי ושהאפליקציה מחוברת ל-Business Portfolio.</p>
+  <p class="stuck">שמות המסכים ב-Meta משתנים, ושלבים 6 ו-7 מבוססים על הנוהל הרגיל של משתמשי מערכת. אם משהו שונה ממה שאתם רואים, תתאימו למסך. אם ההתקנה בשלב 4 מודיעה ש-Meta דחתה את הטוקן, תעתיקו את ההודעה שלה ותשלחו אותה למי שמתחזק את הריפו.</p>
   <label class="check"><input type="checkbox"> סיימתי את השלב</label>
 </section>
 

@@ -12,7 +12,7 @@
 1. מסבירים במשפט אחד מה ייבנה בסוף: דשבורד אישי באינטרנט, שמגיב אוטומטית בהודעה פרטית למי שמגיב על פוסט, ריל או סטורי שלו.
 2. שואלים: איזו מערכת הפעלה (Windows, Mac), ואיך ייקרא חשבון האינסטגרם.
 3. בודקים בטרמינל: `node -v` (נדרש 20 ומעלה) ו-`git --version`. אם חסר Node.js, מנחים להתקין את גרסת ה-LTS מ-`https://nodejs.org` ולפתוח טרמינל חדש.
-4. מריצים `npm install` בתיקיית הריפו.
+4. מריצים `npm ci` בתיקיית הריפו (ולא `npm install`, כדי לא לשנות את `package-lock.json`). אזהרות על "10 פגיעויות" ועל סקריפטי install הן בכלי הפיתוח בלבד, ולא בקוד שרץ בענן, ואפשר להתעלם מהן. אם בכל זאת השתנה `package-lock.json`: `git checkout package-lock.json` לפני `git pull`.
 5. מוודאים שחשבון האינסטגרם הוא **מקצועי** (עסקי או יוצר). אם לא: באפליקציית אינסטגרם, הגדרות, "סוג חשבון ועבודה", מעבר לחשבון מקצועי.
 
 **איך יודעים שהצליח:** `npm test` עובר ללא שגיאות.
@@ -41,26 +41,26 @@
 
 ## שלב 3: חשבון מפתחים ואפליקציה ב-Meta
 
-**מטרה:** אפליקציה שמאשרת ל-D-ME לקרוא תגובות ולשלוח הודעות מהחשבון המקצועי.
+**מטרה:** אפליקציה שמאשרת ל-D-ME לקרוא תגובות ולשלוח הודעות מהחשבון המקצועי, וטוקן שמאפשר זאת.
 
-**חשוב לדעת קודם (שינוי של Meta, אוקטובר 2026):** אפליקציות חדשות כבר לא מציעות את "Instagram login" הישן, אלא את **Unified Login** (התחברות אחידה, דרך Business Portfolio). אפליקציה ישנה שכבר קיימת ב-My Apps ממשיכה לעבוד. ההקמה של D-ME לא מניחה איזו דרך בחרת: סקריפט ההתקנה בודק בעצמו מול Meta איזו כתובת (`graph.instagram.com` או `graph.facebook.com`) מקבלת את הטוקן, ושומר את התוצאה.
+**שינוי של Meta (אוקטובר 2026), נבדק בפועל על אפליקציה חדשה:** בדף ה-use case מופיעה ההודעה "API setup with Instagram login is not available for newer apps. Your app uses API setup with Unified login instead." אפליקציה חדשה עובדת עם **Unified login** (Facebook Login for Business) ועם הרשאות בשמות `instagram_basic`, `instagram_manage_comments`, `instagram_manage_messages` (בלי "business"). הטוקן הוא של **משתמש מערכת** (Business Integration System User) בתוך Business Portfolio, והכתובת היא `graph.facebook.com`. אפליקציה ישנה שכבר קיימת ב-My Apps ממשיכה לעבוד עם Instagram login. סקריפט ההתקנה בודק בעצמו מול Meta איזו כתובת מקבלת את הטוקן, ולכן אין צורך להכריע מראש.
 
-**מה עושים:**
+**מה עושים (אפליקציה חדשה):**
 1. המשתמש נכנס ל-`https://developers.facebook.com`, מתחבר (נדרש חשבון פייסבוק) ועובר הרשמה כמפתח, כולל אימות.
-2. אם כבר יש אפליקציה קיימת עם Instagram login ב-My Apps: אפשר להשתמש בה ולדלג לצעד 5. אחרת **Create App**.
-3. שם האפליקציה: לא להשתמש ב-"Insta", "IG" או "gram" (Meta חוסמת). אימייל קשר: שלו.
-4. באפליקציה חדשה Meta עשויה לדרוש לחבר **Business Portfolio** (אפשר ליצור אחד חינם). בבחירת סוג השימוש לבחור את זה שקשור ל-Instagram, ולהוסיף את המוצר **Instagram**.
-5. בלוח האפליקציה: **Instagram > API setup** (השם משתנה, למשל "API setup with Instagram business login"). שם: **Add account** לחשבון המקצועי, והתחברות עם אינסטגרם. נוצר **Instagram account ID** מספרי. לרשום, הוא לא סוד.
-6. **Generate token** לחשבון. לרשום בצד את התוקף שמוצג (בדרך כלל כ-60 יום). **הטוקן לא מועתק לצ'אט**: המשתמש מקליד אותו בשלב 4 בלבד.
-7. את ה-**App secret** מוצאים בלוח האפליקציה (App settings > Basic, ולעיתים גם באותו מסך API setup). גם הוא לא עובר בצ'אט.
-8. ההרשאות: `instagram_business_basic`, `instagram_business_manage_comments`, `instagram_business_manage_messages`. בגרסת Unified Login הן עשויות להופיע בשמות `instagram_basic`, `instagram_manage_comments`, `instagram_manage_messages`. מאשרים את כולן.
+2. יש כבר אפליקציה ישנה עם Instagram login ב-My Apps? אפשר להשתמש בה ולעבור לשלב 4 עם הטוקן שלה. אחרת **Create App**.
+3. שם האפליקציה: בלי "Insta", "IG" או "gram" (Meta חוסמת). אימייל קשר: שלו. ה-use case: **Manage messaging & content on Instagram**.
+4. חיבור **Business Portfolio** (אפשר ליצור אחד בחינם). לעיתים מופיעה פעם אחת הודעת "Verification Required", ובניסיון נוסף החיבור מצליח. אימות עסק מלא לא נדרש כדי להתחיל לבדוק.
+5. את ה-**App secret** מוצאים ב-App settings > Basic. הוא לא עובר בצ'אט.
+6. **טוקן של משתמש מערכת.** נכנסים ל-Meta Business Settings (`business.facebook.com/settings`) של אותו Business Portfolio: Users > System users > **Add** (תפקיד Admin). מוסיפים לו נכסים: האפליקציה, ובנוסף חשבון האינסטגרם (Accounts > Instagram accounts). אחר כך **Generate new token**: בוחרים את האפליקציה, תוקף (אם יש אפשרות "Never", עדיף אותה), וההרשאות `instagram_basic`, `instagram_manage_comments`, `instagram_manage_messages`. את הטוקן שומרים בצד, **לא בצ'אט**.
+7. **Instagram account ID** מספרי של החשבון המקצועי. אפשר לראות אותו ב-Business Settings ליד החשבון, או במסך ה-use case. הוא לא סוד.
 
-**איך יודעים שהצליח:** ידועים ה-Instagram account ID, הטוקן (עם תוקף) וה-app secret.
+**איך יודעים שהצליח:** ידועים ה-Instagram account ID, הטוקן (ותוקפו) וה-app secret.
+
+**שלא אומת:** הצעדים 6 ו-7 מבוססים על הנוהל הרגיל של משתמשי מערכת ב-Meta, ושמות המסכים עשויים להיות שונים. אם משהו אחר ממה שרואים, מתאימים למסך ולא ממציאים. אם הטוקן נדחה בשלב 4, ההודעה של הסקריפט מציגה את הסיבה, ואפשר לשלוח אותה למי שמתחזק את הריפו.
 
 **אם נתקע:**
-- האפשרות לא מופיעה: מחפשים בתפריט Products. Meta משנה מסכים, והעיקרון נשאר.
-- Meta לא נותנת ליצור טוקן: ייתכן שהחשבון חייב להיות מקצועי וציבורי, או שחסר חיבור ל-Business Portfolio.
-- אם נתקלים במסך שלא מתאים לתיאור, מתאימים את ההדרכה למה שרואים ולא ממציאים.
+- אפשרות לא מופיעה: מחפשים ב-Products ובתפריט ה-use case.
+- Meta לא נותנת ליצור טוקן: מוודאים שהחשבון מקצועי וציבורי, ושחשבון האינסטגרם מחובר ל-Business Portfolio כנכס של משתמש המערכת.
 
 ## שלב 4: ההתקנה (D1, secrets, פריסה)
 
