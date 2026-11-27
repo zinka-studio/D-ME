@@ -78,7 +78,7 @@ describe("Zernio mode", () => {
     const url = new URL("https://w.test/api/automations");
     const response = await handleZernioAdmin(new Request(url, { headers: auth }), env, url);
     const payload = await response.json<{ automations: Array<{ id: string }> }>();
-    expect(payload.automations[0].id).toBe("a1");
+    expect(payload.automations[0]?.id).toBe("a1");
     expect(calls.map((call) => call.url)).toContain("https://zernio.com/api/v1/comment-automations?profileId=prof1");
   });
 
@@ -110,7 +110,7 @@ describe("Zernio mode", () => {
     expect(response.status).toBe(201);
     const posts = calls.filter((call) => call.method === "POST");
     expect(posts.map((call) => (call.body as { platformPostId: string }).platformPostId)).toEqual(["old1", "old2"]);
-    expect(posts[0].body).toMatchObject({ accountId: "acc1", profileId: "prof1" });
+    expect(posts[0]?.body).toMatchObject({ accountId: "acc1", profileId: "prof1" });
   });
 
   it("deletes by automation id", async () => {

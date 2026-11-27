@@ -1,41 +1,5 @@
-import { env, SELF } from "cloudflare:test";
+import { SELF } from "cloudflare:test";
 import { describe, expect, it } from "vitest";
-
-async function ensureAutomationTables() {
-  await env.DB.batch([
-    env.DB.prepare(`CREATE TABLE IF NOT EXISTS automations (
-      id TEXT PRIMARY KEY,
-      enabled INTEGER NOT NULL,
-      media_id TEXT NOT NULL,
-      keywords_json TEXT NOT NULL,
-      match_mode TEXT NOT NULL,
-      target_url TEXT NOT NULL,
-      message_template TEXT NOT NULL,
-      reply_options_json TEXT NOT NULL DEFAULT '[]',
-      comment_reply_options_json TEXT NOT NULL DEFAULT '[]',
-      follow_gate INTEGER NOT NULL,
-      follow_prompt TEXT NOT NULL,
-      follow_button TEXT NOT NULL,
-      follow_check_fail_open INTEGER NOT NULL,
-      media_selection_mode TEXT NOT NULL DEFAULT 'selected',
-      trigger_source TEXT NOT NULL DEFAULT 'comment',
-      created_at TEXT NOT NULL DEFAULT CURRENT_TIMESTAMP,
-      updated_at TEXT NOT NULL DEFAULT CURRENT_TIMESTAMP
-    )`),
-    env.DB.prepare(`CREATE TABLE IF NOT EXISTS processed_comments (
-      comment_id TEXT PRIMARY KEY,
-      automation_id TEXT NOT NULL,
-      status TEXT NOT NULL,
-      profile_follow_status INTEGER
-    )`),
-    env.DB.prepare(`CREATE TABLE IF NOT EXISTS story_sources (
-      story_id TEXT PRIMARY KEY,
-      story_url TEXT,
-      first_seen_at TEXT NOT NULL DEFAULT CURRENT_TIMESTAMP,
-      last_seen_at TEXT NOT NULL DEFAULT CURRENT_TIMESTAMP
-    )`),
-  ]);
-}
 
 describe("admin interface", () => {
   it("serves the Hebrew automation builder with hardened headers", async () => {
@@ -116,42 +80,5 @@ describe("admin interface", () => {
   it("protects Instagram media discovery with the admin token", async () => {
     const response = await SELF.fetch("https://worker.test/api/instagram/media");
     expect(response.status).toBe(401);
-  });
-
-  it("persists a Story and Highlight reply automation as a separate trigger source", async () => {
-    await ensureAutomationTables();
-    const headers = { Authorization: `Bearer ${env.ADMIN_TOKEN}`, "Content-Type": "application/json" };
-    const response = await SELF.fetch("https://worker.test/api/automations", {
-      method: "POST",
-      headers,
-      body: JSON.stringify({
-        id: "story-reply-test",
-        enabled: true,
-        mediaId: "*",
-        mediaIds: ["*"],
-        mediaMode: "stories",
-        triggerSource: "story_reply",
-        keywords: ["לינק"],
-        matchMode: "exact",
-        targetUrl: "https://example.com/story-guide",
-        messageTemplate: "הנה הלינק {{url}}",
-        commentReplyOptions: [],
-        followGate: false,
-        followPrompt: "עקוב ואז בדוק",
-        followButton: "עקבתי",
-        followCheckFailOpen: true,
-      }),
-    });
-    expect(response.status, await response.clone().text()).toBe(201);
-
-    const listing = await SELF.fetch("https://worker.test/api/automations", { headers });
-    const payload = await listing.json<{ automations: Array<Record<string, unknown>> }>();
-    expect(payload.automations).toContainEqual(expect.objectContaining({
-      id: "story-reply-test",
-      mediaMode: "stories",
-      triggerSource: "story_reply",
-      mediaId: "*",
-      commentReplyOptions: [],
-    }));
   });
 });

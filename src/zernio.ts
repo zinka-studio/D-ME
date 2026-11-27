@@ -1,5 +1,15 @@
 import { secureStringEqual } from "./security";
-import type { InstagramMediaItem } from "./types";
+
+export interface InstagramMediaItem {
+  id: string;
+  caption: string;
+  mediaType: string;
+  mediaUrl: string | null;
+  thumbnailUrl: string | null;
+  permalink: string | null;
+  timestamp: string | null;
+  source: "feed" | "reel" | "story" | "highlight";
+}
 
 /**
  * Zernio mode: the dashboard manages comment-to-DM automations that Zernio runs.
@@ -9,10 +19,10 @@ import type { InstagramMediaItem } from "./types";
 
 const ZERNIO_BASE = "https://zernio.com/api/v1";
 
-type ZernioEnv = Env & { ZERNIO_API_KEY?: string; ZERNIO_ACCOUNT_ID?: string; ZERNIO_PROFILE_ID?: string };
+type ZernioEnv = Env & { ZERNIO_ACCOUNT_ID?: string; ZERNIO_PROFILE_ID?: string };
 
 export function zernioEnabled(env: Env): boolean {
-  return Boolean((env as ZernioEnv).ZERNIO_API_KEY);
+  return Boolean(env.ZERNIO_API_KEY);
 }
 
 function json(data: unknown, status = 200): Response {
@@ -29,7 +39,7 @@ async function zernio<T>(env: Env, path: string, init: RequestInit = {}): Promis
   const response = await fetch(`${ZERNIO_BASE}${path}`, {
     ...init,
     headers: {
-      Authorization: `Bearer ${(env as ZernioEnv).ZERNIO_API_KEY}`,
+      Authorization: `Bearer ${env.ZERNIO_API_KEY}`,
       "Content-Type": "application/json",
       ...(init.headers ?? {}),
     },
@@ -198,6 +208,7 @@ async function isAuthorized(request: Request, env: Env): Promise<boolean> {
 
 export async function handleZernioAdmin(request: Request, env: Env, url: URL): Promise<Response> {
   if (!await isAuthorized(request, env)) return json({ error: "Unauthorized" }, 401);
+  if (!zernioEnabled(env)) return json({ error: "ZERNIO_API_KEY is not set on this Worker. Run: npm run setup -- --apply" }, 503);
   try {
     if (request.method === "GET" && url.pathname === "/api/automations") {
       const { profileId } = await resolveAccount(env);
