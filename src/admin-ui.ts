@@ -156,17 +156,17 @@ const HTML = `<!doctype html>
         <aside class="side-col">
 
 
-          <section class="phone" aria-label="תצוגה מקדימה">
+          <section class="phone phone-post" aria-label="תצוגה מקדימה של הפוסט">
             <div class="phone-head"><span class="avatar" id="previewAvatar"></span><b id="previewUsername">your_account</b></div>
             <div class="phone-media" id="previewMedia"></div>
             <p class="phone-caption" id="previewCaption"></p>
             <div class="phone-comments" id="previewComments"></div>
-            <div class="phone-dm" id="previewDm">
-              <p class="phone-label">הודעה פרטית</p>
-              <div id="previewGate"><div class="bubble out" id="previewFollowPrompt"></div><span class="dm-button" id="previewFollowButton">עקבתי</span><div class="bubble in" id="previewFollowClick">עקבתי</div></div>
-              <div class="bubble out" id="previewMessage"></div>
-              <span class="dm-button link" id="previewLink">לינק</span>
-            </div>
+          </section>
+          <section class="phone phone-dm" id="previewDm" aria-label="תצוגה מקדימה של ההודעה הפרטית">
+            <p class="phone-label">הודעה פרטית</p>
+            <div id="previewGate"><div class="bubble out" id="previewFollowPrompt"></div><span class="dm-button" id="previewFollowButton">עקבתי</span><div class="bubble in" id="previewFollowClick">עקבתי</div></div>
+            <div class="bubble out" id="previewMessage"></div>
+            <span class="dm-button link" id="previewLink">לינק</span>
           </section>
         </aside>
       </div>
@@ -331,7 +331,7 @@ input:focus-visible+.switch{outline:3px solid var(--cobalt);outline-offset:2px}
 #gateFields.disabled{opacity:.45;pointer-events:none}
 .public-off{opacity:.5}
 
-.side-col{position:sticky;top:24px;max-height:calc(100vh - 48px);overflow-y:auto;display:grid;gap:var(--gap);min-width:0}
+.side-col{position:sticky;top:2.5vh;height:95vh;display:flex;flex-direction:column;gap:16px;min-width:0}
 .hero,.phone{min-width:0}
 .hero{display:grid;gap:12px;padding:18px;background:var(--tomato);border:var(--bw) solid var(--ink);border-radius:var(--r-card);box-shadow:var(--shadow)}
 .hero h3{margin:0;font-size:var(--fs-lg)}
@@ -353,19 +353,22 @@ input:focus-visible+.switch{outline:3px solid var(--cobalt);outline-offset:2px}
 .actions{display:grid;grid-template-columns:1fr 1fr;gap:12px}
 .hero .text-button{justify-self:start;color:var(--ink)}
 
-.phone{padding:16px;background:var(--surface);border:var(--bw) solid var(--ink);border-radius:var(--r-card);box-shadow:var(--shadow)}
-.phone-head{display:flex;align-items:center;gap:10px;font-size:var(--fs-sm)}
-.phone-head .avatar{width:36px;height:36px}
-.phone-media{display:grid;place-items:center;margin:12px 0;aspect-ratio:1;overflow:hidden;border:var(--bw) solid var(--ink);border-radius:var(--r-inner);background:var(--surface-2);font-size:40px}
+.phone{padding:14px;background:var(--surface);border:var(--bw) solid var(--ink);border-radius:var(--r-card);box-shadow:var(--shadow)}
+.phone-head{flex:none;display:flex;align-items:center;gap:10px;font-size:var(--fs-xs)}
+.phone-head .avatar{width:30px;height:30px}
+.phone-post{flex:1 1 auto;min-height:0;display:flex;flex-direction:column;overflow:hidden}
+.phone-dm{flex:none}
+.phone-media{flex:1 1 auto;min-height:80px;display:grid;place-items:center;margin:10px 0;overflow:hidden;border:var(--bw) solid var(--ink);border-radius:var(--r-inner);background:var(--surface-2);font-size:40px}
 .phone-media img,.phone-media video{width:100%;height:100%;object-fit:cover}
-.phone-caption{margin:0 0 10px;font-size:var(--fs-sm);overflow:hidden;display:-webkit-box;-webkit-line-clamp:3;-webkit-box-orient:vertical}
-.phone-comment{margin:8px 0;font-size:var(--fs-sm)}
+.phone-caption{flex:none;margin:0 0 6px;font-size:var(--fs-xs);overflow:hidden;display:-webkit-box;-webkit-line-clamp:3;-webkit-box-orient:vertical}
+.phone-comments{flex:none}
+.phone-comment{margin:4px 0;font-size:var(--fs-xs)}
 .phone-comment .reply{margin-inline-start:22px;color:var(--text-2)}
-.phone-label{margin:16px 0 8px;color:var(--text-2);font-size:var(--fs-xs);text-align:center}
-.bubble{max-width:85%;width:max-content;margin:6px 0;padding:10px 14px;border:var(--bw) solid var(--ink);border-radius:16px;font-size:var(--fs-sm);line-height:1.4;overflow-wrap:anywhere}
+.phone-label{margin:0 0 6px;color:var(--text-2);font-size:var(--fs-xs);text-align:center}
+.bubble{max-width:85%;width:max-content;margin:5px 0;padding:7px 12px;border:var(--bw) solid var(--ink);border-radius:14px;font-size:var(--fs-xs);line-height:1.4;overflow-wrap:anywhere}
 .bubble.out{margin-inline-start:auto;background:var(--cobalt);color:#fff;border-end-end-radius:4px}
 .bubble.in{background:var(--surface-2);border-end-start-radius:4px}
-.dm-button{display:block;width:70%;margin:6px 0 6px auto;padding:8px;border:var(--bw) solid var(--ink);border-radius:10px;background:var(--lemon);font-weight:700;font-size:var(--fs-sm);text-align:center}
+.dm-button{display:block;width:70%;margin:5px 0 5px auto;padding:5px;border:var(--bw) solid var(--ink);border-radius:10px;background:var(--lemon);font-weight:700;font-size:var(--fs-xs);text-align:center}
 .dm-button.link{background:var(--surface)}
 
 .view{display:grid;gap:18px}
@@ -393,7 +396,7 @@ input:focus-visible+.switch{outline:3px solid var(--cobalt);outline-offset:2px}
 .toast.visible{opacity:1;transform:none}
 .toast.error{background:var(--tomato);color:var(--ink)}
 
-@media(max-width:1050px){.workspace{grid-template-columns:minmax(0,1fr)}.side-col{position:static}}
+@media(max-width:1050px){.workspace{grid-template-columns:minmax(0,1fr)}.side-col{position:static;height:auto}.phone-media{flex:none;aspect-ratio:1}}
 @media(max-width:640px){
 :root{--pad:16px;--gap:16px;--r-inner:10px;--fs-xs:12px;--fs-sm:14px;--fs-md:15px;--fs-lg:17px;--fs-h2:19px;--fs-kpi:26px;--shadow:4px 4px 0 var(--ink)}
 .side{position:static;inset:auto;width:auto;margin:16px 16px 0;padding:16px;gap:12px;overflow:visible}
