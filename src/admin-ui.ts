@@ -113,9 +113,9 @@ const HTML = `<!doctype html>
               <div class="field-grid" id="keywordFields">
                 <label class="field"><span>מילות תגובה <small>אפשר כמה, מופרדות בפסיק</small></span>
                   <input id="keywords" maxlength="500" placeholder="לינק, פרטים, שלח לי"></label>
-                <fieldset class="field"><legend>אופן ההתאמה</legend>
-                  <div class="seg"><label><input type="radio" name="matchMode" value="exact" checked><span>מילה מדויקת</span></label><label><input type="radio" name="matchMode" value="contains"><span>מכילה</span></label></div>
-                </fieldset>
+                <div class="field"><span id="matchLabel">אופן ההתאמה</span>
+                  <div class="seg" role="radiogroup" aria-labelledby="matchLabel"><label><input type="radio" name="matchMode" value="exact" checked><span>מילה מדויקת</span></label><label><input type="radio" name="matchMode" value="contains"><span>מכילה</span></label></div>
+                </div>
               </div>`)}
           ${step("publicPanel", "rule", "תגובה פומבית", `
               <label class="field"><span>תגובה מתחת לפוסט <small>עד 3 נוסחים, נבחר אחד בכל פעם</small></span>
@@ -277,13 +277,13 @@ main{margin-right:calc(var(--side-w) + 48px);padding:24px 24px 48px 24px}
 .pager button[aria-current]{background:var(--ink);color:#fff}
 .pager .arrow{font-size:var(--fs-lg)}
 .seg{display:inline-flex;height:var(--control-h);border:var(--bw) solid var(--ink);border-radius:var(--r-sm);overflow:hidden;background:var(--surface)}
-.seg label{position:relative}
-.seg input{position:absolute;opacity:0;pointer-events:none}
-.seg label{display:flex}
+.seg label{position:relative;display:flex;align-items:stretch}
+.seg input{position:absolute;inset:0;width:0;height:0;margin:0;opacity:0;pointer-events:none}
 .seg span{display:flex;flex:1;align-items:center;justify-content:center;padding:0 18px;font-weight:500;font-size:var(--fs-sm);cursor:pointer}
 .seg label+label span{border-inline-start:var(--bw) solid var(--ink)}
 .seg input:checked+span{background:var(--lemon)}
-.seg input:focus-visible+span{outline:3px solid var(--cobalt);outline-offset:-4px}
+.seg input:focus{outline:none}
+.seg input:focus-visible+span{box-shadow:inset 0 0 0 3px var(--cobalt)}
 .seg.two{display:grid;grid-template-columns:1fr 1fr}
 .seg.two span{text-align:center}
 .seg.two input:checked+span{background:var(--ink);color:#fff}
@@ -334,9 +334,9 @@ input:focus-visible+.switch{outline:3px solid var(--cobalt);outline-offset:2px}
 .switch-row{position:relative;display:flex;align-items:center;gap:14px;cursor:pointer}
 .switch-row b{display:block}
 .switch-row small{display:block;color:var(--text-2);font-size:var(--fs-sm)}
-.field-grid{display:grid;grid-template-columns:repeat(2,minmax(0,1fr));gap:18px;align-items:end}
+.field-grid{display:grid;grid-template-columns:repeat(2,minmax(0,1fr));gap:18px;align-items:start}
 .field{display:grid;gap:8px;align-content:start;min-width:0}
-.field>span,.field legend{font-size:var(--fs-sm);font-weight:500}
+.field>span{display:block;font-size:var(--fs-sm);font-weight:500;line-height:1.4}
 .field small{color:var(--text-2);font-weight:400}
 .field input:not([type=range]){height:var(--control-h)}
 .field input:not([type=range]),.field textarea{width:100%;min-height:var(--control-h);padding:12px 14px;border:var(--bw) solid var(--ink);border-radius:var(--r-inner);background:#fff;font-size:var(--fs-md)}
