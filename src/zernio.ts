@@ -203,6 +203,7 @@ function mediaItem(post: { id?: string; message?: string; createdTime?: string; 
 async function isAuthorized(request: Request, env: Env): Promise<boolean> {
   const authorization = request.headers.get("authorization") || "";
   const supplied = authorization.startsWith("Bearer ") ? authorization.slice(7) : "";
+  if (!env.ADMIN_TOKEN || !supplied) return false;
   return secureStringEqual(supplied, env.ADMIN_TOKEN);
 }
 
