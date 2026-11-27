@@ -154,9 +154,7 @@
 
 **מה המשתמש עושה:**
 1. ב-`https://zernio.com/dashboard/api-keys` יוצר מפתח בשם **D-ME** ומעתיק אותו. דרך המחבר של Zernio אי אפשר ליצור מפתחות, אבל עם שליטה בדפדפן אתה יכול ליצור אותו באתר, וגם להכניס אותו ל-Cloudflare בעצמך.
-2. מכניס אותו באחת משתי דרכים:
-   - **מומלץ:** ב-Cloudflare: d-me, ואז Settings, ואז Variables and Secrets, ואז Add, סוג Secret, שם `ZERNIO_API_KEY`, ואז Deploy.
-   - **או** מדביק אותו לך, ואתה מריץ `printf '%s' "<מפתח>" | npx wrangler secret put ZERNIO_API_KEY --name d-me`, בלי לחזור עליו בתשובה.
+2. מדביק אותו לך בצ'אט. אתה מריץ `printf '%s' "<מפתח>" | npx wrangler secret put ZERNIO_API_KEY --name d-me`, בלי לחזור עליו בתשובה. אומרים לו שהמפתח נשאר בהיסטוריה. מי שמעדיף, מדביק אותו ישר ב-Cloudflare: d-me, ואז Settings, ואז Variables and Secrets, ואז Add, סוג Secret, שם `ZERNIO_API_KEY`.
 
 **בדיקה:** עם הסיסמה:
 - `/api/status`: Zernio מחובר.
