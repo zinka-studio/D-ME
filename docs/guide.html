@@ -5,61 +5,55 @@
 <meta name="viewport" content="width=device-width,initial-scale=1">
 <title>D-ME - מדריך הקמה</title>
 <style>
-@font-face{font-family:"Heebo";src:url("../public/fonts/Heebo-hebrew.woff2") format("woff2");font-weight:100 900;font-display:swap;unicode-range:U+0307-0308,U+0590-05FF,U+200C-2010,U+20AA,U+25CC,U+FB1D-FB4F}
-@font-face{font-family:"Heebo";src:url("../public/fonts/Heebo-latin.woff2") format("woff2");font-weight:100 900;font-display:swap;unicode-range:U+0000-00FF,U+0131,U+0152-0153,U+02BB-02BC,U+02C6,U+02DA,U+02DC,U+0304,U+0308,U+0329,U+2000-206F,U+20AC,U+2122,U+2191,U+2193,U+2212,U+2215,U+FEFF,U+FFFD}
-:root{--bg:#fff;--text:#0a0a0a;--muted:#5f5f5f;--line:#e2e2e2;--line-strong:#bdbdbd;--soft:#f3f3f3;--accent:#ff6f00;--accent-hover:#e66400;--accent-soft:#fff1e6;--accent-line:#ffc08a;--accent-strong:#c24f00;--radius:20px;--shadow:0 1px 2px rgba(0,0,0,.04),0 10px 30px rgba(0,0,0,.06)}
+@font-face{font-family:"Rubik";src:url("../public/fonts/Rubik-hebrew.woff2") format("woff2");font-weight:300 900;font-display:swap;unicode-range:U+0307-0308,U+0590-05FF,U+200C-2010,U+20AA,U+25CC,U+FB1D-FB4F}
+@font-face{font-family:"Rubik";src:url("../public/fonts/Rubik-latin.woff2") format("woff2");font-weight:300 900;font-display:swap}
+:root{--frame:#f6efe1;--side:#cfdaff;--surface:#fffaf0;--surface-2:#f1e8d6;--ink:#111;--text-2:#5d574c;--cobalt:#2343d6;--cobalt-soft:#dbe3ff;--tomato:#ff5b3a;--lemon:#ffd84a;--ok-soft:#cdeedd;--shadow:6px 6px 0 var(--ink)}
 *,*::before,*::after{box-sizing:border-box}
 html{scroll-behavior:smooth}
-body{overflow-x:clip;margin:0;background:var(--bg);color:var(--text);font-family:"Heebo",system-ui,-apple-system,"Segoe UI","Arial Hebrew",Arial,sans-serif;font-size:1rem;line-height:1.65}
-a{color:var(--accent-strong)}
+body{overflow-x:clip;margin:0;background:var(--frame);color:var(--ink);font-family:"Rubik",system-ui,"Arial Hebrew",Arial,sans-serif;font-size:1.0625rem;line-height:1.65}
+a{color:var(--cobalt);font-weight:500}
 button{font:inherit;color:inherit;cursor:pointer}
-:focus-visible{outline:2px solid var(--accent);outline-offset:2px}
-.wrap{display:grid;grid-template-columns:260px minmax(0,1fr);gap:48px;max-width:1120px;margin:0 auto;padding:32px max(16px,env(safe-area-inset-left,0px)) 96px max(16px,env(safe-area-inset-right,0px))}
-header{grid-column:1/-1;padding:24px 0 8px}
-.brand{font-weight:800;font-size:1.25rem;letter-spacing:-.02em}
-h1{margin:12px 0 8px;font-size:clamp(2rem,5vw,3rem);line-height:1.15;font-weight:700;text-wrap:balance}
-h1 .dot{color:var(--accent)}
-.lead{max-width:62ch;margin:0;color:var(--muted);font-size:1.125rem}
-.progress{margin-top:24px;display:flex;align-items:center;gap:16px}
-.bar{flex:1;max-width:420px;height:8px;border-radius:99px;background:var(--soft);overflow:hidden}
-.bar i{display:block;height:100%;width:0;background:var(--accent);transition:width .3s}
-.count{font-size:.875rem;color:var(--muted);font-variant-numeric:tabular-nums}
-main{grid-column:2;grid-row:2;min-width:0;display:grid;gap:20px}
-nav{grid-column:1;grid-row:2;position:sticky;top:24px;align-self:start;display:grid;gap:2px;font-size:.9375rem}
-nav a{display:flex;gap:10px;align-items:baseline;padding:9px 12px;border-radius:10px;color:var(--muted);text-decoration:none;cursor:pointer;transition:background .15s,color .15s}
-nav a:hover{background:var(--soft);color:var(--text)}
-nav a.current{background:var(--accent-soft);color:var(--accent-strong);font-weight:500}
-nav a.done{color:var(--text)}
-nav a.done::after{content:"\2713";margin-inline-start:auto;color:var(--accent-strong)}
-nav b{min-width:1.4em;font-variant-numeric:tabular-nums;color:var(--accent-strong)}
-.intro,.step{padding:28px;border:1px solid var(--line);border-radius:var(--radius);box-shadow:var(--shadow);background:#fff;min-width:0}
-.step.is-done{border-color:var(--accent-line)}
-.step-head{display:flex;gap:14px;align-items:center;margin-bottom:12px}
-.num{display:grid;place-items:center;flex:none;width:40px;height:32px;border-radius:99px;background:var(--accent-soft);color:var(--accent-strong);font-weight:600;font-variant-numeric:tabular-nums}
-h2{margin:0;font-size:1.5rem;line-height:1.25;font-weight:600}
-h3{margin:20px 0 6px;font-size:.9375rem;font-weight:600;color:var(--muted)}
+:focus-visible{outline:3px solid var(--cobalt);outline-offset:2px}
+.wrap{display:grid;grid-template-columns:280px minmax(0,1fr);gap:32px;max-width:1180px;margin:0 auto;padding:24px 16px 96px}
+header{grid-column:1/-1;padding:8px 0}
+.logo{direction:ltr;display:inline-flex;align-items:center;gap:10px;padding:6px 18px 6px 6px;background:var(--surface);border:3px solid var(--ink);border-radius:18px;box-shadow:6px 6px 0 var(--tomato),6px 6px 0 3px var(--ink);font-weight:900;font-style:italic;font-size:1.75rem}
+.logo i{display:grid;place-items:center;width:42px;height:42px;background:#fbc52b;border:3px solid var(--ink);border-radius:12px;font-style:normal}
+h1{margin:24px 0 8px;font-size:clamp(2rem,5vw,3rem);line-height:1.1;font-weight:700;letter-spacing:-.02em}
+.lead{max-width:64ch;margin:0;color:var(--text-2);font-size:1.125rem}
+.progress{margin-top:20px;display:flex;align-items:center;gap:16px}
+.bar{flex:1;max-width:420px;height:14px;border:2px solid var(--ink);border-radius:99px;background:var(--surface);overflow:hidden}
+.bar i{display:block;height:100%;width:0;background:var(--cobalt);transition:width .3s}
+.count{font-size:.9375rem;color:var(--text-2);font-variant-numeric:tabular-nums}
+main{grid-column:2;grid-row:2;min-width:0;display:grid;gap:24px}
+nav{grid-column:1;grid-row:2;position:sticky;top:24px;align-self:start;display:grid;gap:4px;padding:16px;background:var(--side);border:2px solid var(--ink);border-radius:24px;box-shadow:var(--shadow);font-size:.9375rem}
+nav a{display:flex;gap:10px;align-items:baseline;padding:8px 10px;border:2px solid transparent;border-radius:10px;color:var(--ink);font-weight:400;text-decoration:none}
+nav a:hover{background:var(--surface)}
+nav a.current{background:var(--cobalt);color:#fff;border-color:var(--ink)}
+nav a.done::after{content:"\2713";margin-inline-start:auto;font-weight:700}
+nav b{min-width:1.4em;font-variant-numeric:tabular-nums}
+.intro,.step{padding:26px;background:var(--surface);border:2px solid var(--ink);border-radius:28px;box-shadow:var(--shadow);min-width:0}
+.step.is-done{background:#f3fbf6}
+.step-head{display:flex;gap:14px;align-items:center;flex-wrap:wrap;margin-bottom:12px}
+.num{display:grid;place-items:center;flex:none;width:44px;height:44px;border:2px solid var(--ink);border-radius:10px;background:var(--cobalt-soft);font-weight:700;font-variant-numeric:tabular-nums}
+h2{margin:0;font-size:1.5rem;line-height:1.25;font-weight:700}
+.who{margin-inline-start:auto;padding:2px 12px;border:2px solid var(--ink);border-radius:99px;background:var(--lemon);font-size:.8125rem;font-weight:500}
+h3{margin:18px 0 6px;font-size:1rem;font-weight:700}
 p{margin:8px 0}
 ol,ul{margin:8px 0;padding-inline-start:1.4em}
 li{margin:6px 0}
-.ok{margin-top:16px;padding:12px 16px;border-radius:12px;background:var(--accent-soft);border:1px solid var(--accent-line);font-size:.9375rem}
-.ok b{color:var(--accent-strong)}
-.stuck{margin-top:10px;color:var(--muted);font-size:.9375rem}
-.code{position:relative;margin:12px 0;border:1px solid var(--line-strong);border-radius:12px;background:#fff}
+.ok{margin-top:16px;padding:12px 16px;border:2px solid var(--ink);border-radius:12px;background:var(--ok-soft);font-size:.9375rem}
+.shot{margin:14px 0;padding:22px;border:2px dashed var(--ink);border-radius:12px;background:var(--surface-2);color:var(--text-2);font-size:.875rem;text-align:center}
+.code{position:relative;margin:12px 0;border:2px solid var(--ink);border-radius:12px;background:#fff}
 .code pre{margin:0;padding:14px 96px 14px 16px;overflow-x:auto;direction:ltr;text-align:left;font:.875rem/1.6 ui-monospace,SFMono-Regular,Menlo,Consolas,monospace;white-space:pre}
 .code.he .copy{right:auto;left:8px}
-.code.he pre{padding:14px 16px 14px 96px;direction:rtl;text-align:right;white-space:pre-wrap;font-family:"Heebo",system-ui,sans-serif;font-size:.9375rem}
-.copy{position:absolute;top:8px;right:8px;padding:6px 12px;border:1px solid var(--line-strong);border-radius:8px;background:#fff;font-size:.8125rem;font-weight:500}
-.copy:hover{border-color:var(--accent);color:var(--accent-strong)}
-.copy.copied{background:var(--accent);border-color:var(--accent);color:#0a0a0a}
-.check{display:flex;align-items:center;gap:10px;margin-top:20px;padding-top:16px;border-top:1px solid var(--line);cursor:pointer;font-weight:500}
-.check input{width:20px;height:20px;accent-color:var(--accent)}
-table{width:100%;border-collapse:collapse;font-size:.9375rem}
-th,td{padding:10px 12px;border-bottom:1px solid var(--line);text-align:right;vertical-align:top}
-th{color:var(--muted);font-weight:500}
-.table-wrap{overflow-x:auto}
-.note{padding:14px 16px;border:1px solid var(--line-strong);border-radius:12px;font-size:.9375rem}
-footer{grid-column:1/-1;color:var(--muted);font-size:.875rem;padding-top:8px}
-@media(max-width:900px){.wrap{grid-template-columns:minmax(0,1fr);gap:24px}main{grid-column:1}nav{display:none}.intro,.step{padding:20px}}
+.code.he pre{padding:14px 16px 14px 96px;direction:rtl;text-align:right;white-space:pre-wrap;font-family:"Rubik",system-ui,sans-serif;font-size:.9375rem}
+.copy{position:absolute;top:8px;right:8px;padding:6px 12px;border:2px solid var(--ink);border-radius:8px;background:var(--surface);box-shadow:3px 3px 0 var(--ink);font-size:.8125rem;font-weight:500}
+.copy.copied{background:var(--cobalt);color:#fff}
+.check{display:flex;align-items:center;gap:10px;margin-top:18px;padding-top:14px;border-top:2px dashed var(--ink);cursor:pointer;font-weight:500}
+.check input{width:22px;height:22px;accent-color:var(--cobalt)}
+code{padding:1px 6px;border-radius:6px;background:var(--surface-2);font-size:.875em}
+footer{grid-column:1/-1;color:var(--text-2);font-size:.875rem;padding-top:8px}
+@media(max-width:900px){.wrap{grid-template-columns:minmax(0,1fr);gap:20px}main{grid-column:1}nav{display:none}.intro,.step{padding:18px;border-radius:20px}.who{margin-inline-start:0}}
 @media print{nav,.copy{display:none}.intro,.step{box-shadow:none;break-inside:avoid}}
 @media(prefers-reduced-motion:reduce){html{scroll-behavior:auto}.bar i{transition:none}}
 </style>
@@ -67,161 +61,127 @@ footer{grid-column:1/-1;color:var(--muted);font-size:.875rem;padding-top:8px}
 <body>
 <div class="wrap">
 <header>
-  <div class="brand">D-ME</div>
-  <h1>מדריך הקמה<span class="dot">.</span></h1>
-  <p class="lead">מאפס לדשבורד שרץ ב-Cloudflare ועונה אוטומטית למי שמגיב באינסטגרם. אפשר ללכת שלב אחרי שלב לבד, או לתת לסוכן AI להוביל.</p>
-  <div class="progress"><div class="bar" aria-hidden="true"><i id="barFill"></i></div><span class="count" id="count">0 מתוך 9 שלבים</span></div>
+  <span class="logo"><i>➤</i>D-ME</span>
+  <h1>מדריך הקמה</h1>
+  <p class="lead">מאפס לאוטומציה שעונה למי שמגיב באינסטגרם, ולדשבורד בעברית שמתזמן פוסטים. Claude מוביל שלב אחרי שלב ומחכה לאישור שלך בכל שלב.</p>
+  <div class="progress"><div class="bar" aria-hidden="true"><i id="barFill"></i></div><span class="count" id="count">0 מתוך 12 שלבים</span></div>
 </header>
 
 <main>
 <section class="intro" id="start">
-  <h2>הדרך הקלה: סוכן AI מוביל</h2>
-  <p>פותחים את תיקיית הריפו ב-<b>Claude Code</b> או ב-<b>Codex</b>, ואם אפשר מחברים גם <b>Claude בכרום</b>. כותבים לסוכן:</p>
-  <div class="code he"><button class="copy" type="button">העתקה</button><pre>קרא את AGENTS.md והדרך אותי צעד אחר צעד להתקנה של D-ME, מהרגע שאין לי שום חשבון ועד שהדשבורד רץ.</pre></div>
-  <p>הסוכן מוביל בעברית. סיסמאות, קודי אימות, תשלומים וטוקנים מקלידים בעצמך, ולא בצ'אט.</p>
-  <p>המדריך שלמטה מתאר את אותם שלבים, אם מעדיפים ללכת בלי סוכן או לראות מה הולך לקרות.</p>
+  <h2>הדרך הקלה: Claude מוביל</h2>
+  <p>מעתיקים את ההודעה ומדביקים אותה בשיחה חדשה עם Claude (claude.ai, האפליקציה, Claude Code או Codex):</p>
+  <div class="code he"><button class="copy" type="button">העתקה</button><pre>אני רוצה להקים את D-ME: אוטומציה לאינסטגרם. מי שמגיב על פוסט או ריל שלי במילה שבחרתי מקבל הודעה פרטית עם לינק, אפשר גם רק אם הוא עוקב. אפשר גם לתזמן פוסטים חדשים עם אוטומציה שנדלקת כשהם עולים. Zernio מריצה את הכול, ויש דשבורד בעברית על Cloudflare.
+
+המשימה שלך: להקים לי את זה מאפס ולהוביל אותי בעברית פשוטה, שלב אחרי שלב.
+
+1. הורד את הריפו https://github.com/zinka-studio/D-ME (git clone, ואם אין git, את קובץ ה-ZIP) ותיכנס לתיקייה.
+2. קרא את AGENTS.md ואת docs/AGENT_PLAYBOOK_HE.md, ופעל לפיהם לכל אורך העבודה.
+3. תתחיל משלב 0. אין לי עדיין אף חשבון: לא Zernio ולא Cloudflare.
+
+כללים:
+- שלב אחד בכל פעם. תסביר מה עושים, תחכה שאכתוב שסיימתי, תבדוק, ורק אז תמשיך.
+- סיסמאות של חשבונות אני מקליד רק באתרים עצמם, לא בצ'אט.
+- לפני פרסום, תזמון, יצירה או הפעלה של אוטומציה, או פריסה, תציג לי את הפרטים המדויקים ותחכה ל"כן".
+- אם משהו נכשל, תסביר בשפה פשוטה מה קרה ומה עושים.</pre></div>
+  <p>השלבים שלמטה הם אותם שלבים, כדי לראות מה הולך לקרות או ללכת לבד.</p>
 </section>
 
 <section class="step" id="s0" data-step="0">
-  <div class="step-head"><span class="num">0</span><h2>בדיקת דרישות</h2></div>
-  <ul>
-    <li>חשבון אינסטגרם <b>מקצועי</b> (עסקי או יוצר). אם הוא אישי: באפליקציה, הגדרות, "סוג חשבון ועבודה", מעבר לחשבון מקצועי.</li>
-    <li>חשבון פייסבוק, לצורך חשבון מפתחים ב-Meta.</li>
-    <li>Node.js 20 ומעלה (גרסת LTS מ-nodejs.org) ו-git.</li>
-  </ul>
-  <div class="code"><button class="copy" type="button">העתקה</button><pre>node -v
-git --version
-npm ci
-npm test</pre></div>
-  <div class="ok"><b>איך יודעים שהצליח:</b> <code>npm test</code> עובר בלי שגיאות.</div>
+  <div class="step-head"><span class="num">0</span><h2>חשבון אינסטגרם מקצועי</h2><span class="who">אצלך</span></div>
+  <ol><li>באינסטגרם: פרופיל, ואז ☰, ואז הגדרות, ואז "סוג החשבון וכלים".</li><li>צריך להיות כתוב <b>חשבון עסקי</b> או <b>חשבון יוצר</b>. אם לא, "מעבר לחשבון מקצועי" (חינמי).</li><li>החשבון צריך להיות ציבורי.</li></ol>
+  <div class="shot">צילום מסך: סוג החשבון באינסטגרם</div>
+  <p class="ok"><b>איך יודעים שהצליח:</b> כתוב "עסקי" או "יוצר".</p>
   <label class="check"><input type="checkbox"> סיימתי את השלב</label>
 </section>
-
 <section class="step" id="s1" data-step="1">
-  <div class="step-head"><span class="num">1</span><h2>חשבון Cloudflare</h2></div>
-  <p>החשבון שבו ירוץ הדשבורד. המסלול החינמי מספיק להתחלה, בלי כרטיס אשראי.</p>
-  <ol>
-    <li>נכנסים ל-<a href="https://dash.cloudflare.com/sign-up" target="_blank" rel="noopener">dash.cloudflare.com/sign-up</a> ונרשמים עם אימייל וסיסמה.</li>
-    <li>מאשרים את האימייל.</li>
-    <li>בתפריט הצד נכנסים ל-<b>Workers &amp; Pages</b>. בפעם הראשונה בוחרים <b>כתובת משנה</b> (<code dir="ltr">&lt;שם&gt;.workers.dev</code>). השם גלוי, ולכן כדאי שם ניטרלי.</li>
-  </ol>
-  <div class="ok"><b>איך יודעים שהצליח:</b> רואים את הלוח של Workers &amp; Pages בלי הודעות חסימה.</div>
+  <div class="step-head"><span class="num">1</span><h2>חשבון Zernio</h2><span class="who">אצלך</span></div>
+  <p>Zernio מחזיקה את החיבור לאינסטגרם ושולחת את ההודעות, גם כשהמחשב כבוי.</p>
+  <ol><li>נרשמים ב-<a href="https://zernio.com/signup">zernio.com/signup</a>.</li><li>בוחרים תוכנית לפי האתר שלהם.</li></ol><div class="shot">צילום מסך: הלוח של Zernio</div>
+  <p class="ok"><b>איך יודעים שהצליח:</b> נמצאים בתוך הלוח של Zernio.</p>
   <label class="check"><input type="checkbox"> סיימתי את השלב</label>
 </section>
-
 <section class="step" id="s2" data-step="2">
-  <div class="step-head"><span class="num">2</span><h2>התחברות של הכלי ל-Cloudflare</h2></div>
-  <p>ככה הכלי <code dir="ltr">wrangler</code> יכול לפעול בחשבון בלי שהסיסמה עוברת דרך אף אחד. נפתח דפדפן, ולוחצים Allow.</p>
-  <div class="code"><button class="copy" type="button">העתקה</button><pre>npx wrangler login
-npx wrangler whoami</pre></div>
-  <div class="ok"><b>איך יודעים שהצליח:</b> <code>whoami</code> מציג את החשבון והאימייל שלך. אם יש כמה חשבונות, מוודאים שזה הנכון.</div>
+  <div class="step-head"><span class="num">2</span><h2>חיבור האינסטגרם ל-Zernio</h2><span class="who">אצלך</span></div>
+  <ol><li>בלוח של Zernio: Accounts, ואז Connect, ואז Instagram.</li><li>מתחברים לאינסטגרם ומאשרים. הסיסמה מוקלדת רק באינסטגרם.</li></ol><div class="shot">צילום מסך: החשבון מחובר ב-Zernio</div>
+  <p class="ok"><b>איך יודעים שהצליח:</b> החשבון מופיע כמחובר.</p>
   <label class="check"><input type="checkbox"> סיימתי את השלב</label>
 </section>
-
 <section class="step" id="s3" data-step="3">
-  <div class="step-head"><span class="num">3</span><h2>חשבון מפתחים ואפליקציה ב-Meta</h2></div>
-  <p>האפליקציה היא מה שמאשר ל-D-ME לקרוא תגובות ולשלוח הודעות מהחשבון שלך.</p>
-  <div class="note"><b>שינוי של Meta (נובמבר 2026):</b> אפליקציות חדשות לא מקבלות "Instagram login" אלא <b>Unified Login</b>: כתובת <code dir="ltr">graph.facebook.com</code>, הרשאות <code dir="ltr">instagram_basic</code>, <code dir="ltr">instagram_manage_messages</code>, <code dir="ltr">instagram_manage_comments</code>, וטוקן של Business Portfolio. אפליקציה ישנה שכבר קיימת ממשיכה לעבוד. ההתקנה בשלב 4 מוצאת בעצמה את הכתובת ואת מזהה החשבון.</div>
-  <ol>
-    <li>נכנסים ל-<a href="https://developers.facebook.com" target="_blank" rel="noopener">developers.facebook.com</a>, מתחברים, ועוברים הרשמה כמפתח (כולל אימות).</li>
-    <li><b>Create App</b> עם ה-use case <b>Manage messaging &amp; content on Instagram</b>. שם האפליקציה: בלי "Insta", "IG" או "gram". האפליקציה חייבת להיות בבעלות <b>Business Portfolio</b> (אפשר ליצור אחד בחינם). לעיתים מופיעה פעם אחת "Verification Required", ובניסיון נוסף זה מצליח.</li>
-    <li>בלוח האפליקציה: <b>Use cases &gt; Manage messaging &amp; content on Instagram &gt; Customize &gt; API setup with Unified login</b>.</li>
-    <li><b>Configure your app:</b> Create new configuration. ב-<b>Edit permissions</b> משאירים רק <code dir="ltr">instagram_basic</code>, <code dir="ltr">instagram_manage_messages</code>, <code dir="ltr">instagram_manage_comments</code>, ואז Use this configuration. ב-Redirect URL מזינים כתובת HTTPS כלשהי ושומרים (D-ME לא משתמש בה). רושמים את סוג הטוקן ותוקפו מהתצוגה המקדימה.</li>
-    <li><b>Generate access tokens:</b> Add account, ומזמינים את חשבון האינסטגרם כ-<b>Instagram Tester</b>. מאשרים את ההזמנה באינסטגרם באתר: Settings &gt; Website permissions &gt; Apps and websites &gt; <b>Tester Invites</b>. אחר כך <b>Generate token</b>, ומעתיקים את הטוקן: <b>הוא מוצג פעם אחת בלבד</b>. שומרים בצד. <b>לא מדביקים בצ'אט.</b></li>
-    <li>את ה-<b>App secret</b> מוצאים ב-App settings &gt; Basic. משתמשים ב-ID וב-secret של אפליקציית Meta, ולא של Instagram. שומרים בצד.</li>
-  </ol>
-  <div class="ok"><b>איך יודעים שהצליח:</b> יש טוקן ו-app secret שמורים בצד, ורשום תוקף הטוקן. מזהה החשבון לא נדרש: ההתקנה מוצאת אותו.</div>
-  <p class="stuck">הלשונית "API setup with Unified login" לא מופיעה? האפליקציה לא בבעלות Business Portfolio. ה-Tester לא מופיע בטבלה? ההזמנה לא אושרה באינסטגרם באתר. חשבונות בדיקה (test users) לא נתמכים, צריך חשבון מקצועי אמיתי.</p>
+  <div class="step-head"><span class="num">3</span><h2>חיבור Zernio ל-Claude</h2><span class="who">אצלך, Claude מנחה</span></div>
+  <p>ככה Claude יכול לבדוק את החשבון, ליצור אוטומציות ולתזמן פוסטים. התחברות בדפדפן, בלי מפתח.</p>
+  <h3>ב-claude.ai או באפליקציה</h3>
+  <ol><li>נכנסים ל-<a href="https://claude.ai/customize/connectors">claude.ai/customize/connectors</a>.</li><li>Add custom connector, ובו הכתובת:</li></ol>
+  <div class="code"><button class="copy" type="button">העתקה</button><pre>https://mcp.zernio.com/mcp</pre></div>
+  <ol start="3"><li>מתחברים ומאשרים, ופותחים <b>שיחה חדשה</b>.</li></ol>
+  <h3>ב-Claude Code</h3><div class="code"><button class="copy" type="button">העתקה</button><pre>claude mcp add --transport http zernio https://mcp.zernio.com/mcp</pre></div><div class="shot">צילום מסך: הוספת מחבר מותאם</div>
+  <p class="ok"><b>איך יודעים שהצליח:</b> Claude כותב שהוא רואה את החשבון שלך (שלב 4).</p>
   <label class="check"><input type="checkbox"> סיימתי את השלב</label>
 </section>
-
 <section class="step" id="s4" data-step="4">
-  <div class="step-head"><span class="num">4</span><h2>ההתקנה</h2></div>
-  <p>מריצים <b>בטרמינל שלך</b>. הסקריפט יוצר מסד נתונים, מפעיל מיגרציות, שומר את הסודות ב-Cloudflare ופורס. הוא שואל בהזנה מוסתרת את הטוקן ואת ה-app secret.</p>
-  <div class="code"><button class="copy" type="button">העתקה</button><pre>npm run setup -- --apply</pre></div>
-  <ol>
-    <li>הסקריפט מציג את חשבון ה-Cloudflare. מקלידים <code>yes</code> אם זה הנכון.</li>
-    <li>מקלידים את הטוקן ואת ה-app secret כשנשאל (לא רואים אותם בזמן ההקלדה, וזה תקין). הסקריפט בודק את הטוקן מול Meta, מוצא בעצמו את חשבון האינסטגרם, ורק אז יוצר משהו בענן.</li>
-    <li>בסוף הוא גם מנסה לרשום את החשבון לאירועי תגובות והודעות. מוצגות כתובת הדשבורד וכתובת ה-webhook.</li>
-    <li>הסיסמה וה-Verify token נשמרים בקובץ <code dir="ltr">d-me-tokens.txt</code>. פותחים אותו בעצמך, מעתיקים למנהל סיסמאות, ומוחקים אותו.</li>
-  </ol>
-  <div class="ok"><b>איך יודעים שהצליח:</b> <code dir="ltr">/health</code> בכתובת שלך מחזיר <code dir="ltr">{"ok":true}</code>. הסקריפט בודק זאת בעצמו.</div>
-  <p class="stuck">נתקע? Cloudflare לא מחובר: חוזרים לשלב 2. אין כתובת workers.dev: חוזרים לשלב 1. הפריסה נכשלה אחרי יצירת המסד: לא מריצים הכול מחדש, אלא בודקים בלוח (Storage &amp; Databases, D1) ומריצים <code>npm run deploy</code>.</p>
+  <div class="step-head"><span class="num">4</span><h2>בדיקת החיבור</h2><span class="who">Claude</span></div>
+  <p>Claude מציג את חשבונות האינסטגרם המחוברים ושואל על איזה מהם עובדים. כאן אפשר לעצור ולעבוד רק דרך Claude. לדשבורד ממשיכים.</p>
+  <p class="ok"><b>איך יודעים שהצליח:</b> מאשרים את שם החשבון.</p>
   <label class="check"><input type="checkbox"> סיימתי את השלב</label>
 </section>
-
 <section class="step" id="s5" data-step="5">
-  <div class="step-head"><span class="num">5</span><h2>חיבור ה-webhook ב-Meta</h2></div>
-  <p>ככה האינסטגרם שולחת ל-D-ME כל תגובה והודעה חדשה.</p>
-  <ol>
-    <li>באפליקציה ב-Meta: <b>API setup with Unified login &gt; Configure webhooks</b>.</li>
-    <li><b>Callback URL:</b> כתובת ה-webhook משלב 4 (נגמרת ב-<code dir="ltr">/webhook/instagram</code>). <b>Verify token:</b> הערך מהקובץ <code dir="ltr">d-me-tokens.txt</code>. לוחצים <b>Verify and save</b>.</li>
-    <li>מסמנים את השדות <b>comments</b> ו-<b>messages</b>.</li>
-    <li>שני דברים שונים: ה-webhook של האפליקציה (עכשיו), ו<b>מנוי של החשבון</b> לאירועים. את המנוי ההתקנה כבר ניסתה לעשות בעצמה. בלי מנוי של החשבון ה-webhook שקט.</li>
-  </ol>
-  <div class="ok"><b>איך יודעים שהצליח:</b> Meta מאשרת את ה-Callback בלי שגיאה.</div>
-  <div class="note"><b>מגבלות מהתיעוד של Meta:</b> האפליקציה חייבת להיות <b>Live</b> כדי לקבל התראות מגולשים. התראות על תגובות דורשות <b>Advanced Access</b> (App Review), ולייצור גם אימות עסק. החשבון חייב להיות <b>ציבורי</b>. ויש מגבלה זמנית: אם חשבון האינסטגרם לא מקושר לדף פייסבוק, התראות הודעות (כולל תגובות לסטורי וכפתור "עקבתי") עשויות לא להגיע. הפתרון של Meta: configuration נפרד שמבקש גם את הדף המקושר וההרשאה <code dir="ltr">pages_show_list</code>.</div>
-  <p class="stuck">אם Meta לא מאשרת: ה-Verify token שונה ממה שנשמר, או שהכתובת לא נכונה. אם אחר כך אירועים מקבלים 401: ה-app secret שהוזן אינו זה ש-Meta חותמת איתו. מנסים את ה-App secret של האפליקציה (App settings, Basic) ומחליפים:</p>
-  <div class="code"><button class="copy" type="button">העתקה</button><pre>npx wrangler secret put IG_APP_SECRET --config wrangler.local.jsonc</pre></div>
+  <div class="step-head"><span class="num">5</span><h2>חשבון Cloudflare</h2><span class="who">אצלך</span></div>
+  <p>הדשבורד ירוץ אצלך ב-Cloudflare, בחינם.</p><ol><li>נרשמים ב-<a href="https://dash.cloudflare.com/sign-up">dash.cloudflare.com/sign-up</a> ומאמתים את האימייל.</li></ol>
+  <p class="ok"><b>איך יודעים שהצליח:</b> נמצאים בתוך הלוח של Cloudflare.</p>
   <label class="check"><input type="checkbox"> סיימתי את השלב</label>
 </section>
-
 <section class="step" id="s6" data-step="6">
-  <div class="step-head"><span class="num">6</span><h2>הדשבורד והאוטומציה הראשונה</h2></div>
-  <ol>
-    <li>פותחים את <code dir="ltr">&lt;הכתובת שלך&gt;/admin</code>. בשדה "מפתח ניהול" מזינים את הסיסמה מ-<code dir="ltr">d-me-tokens.txt</code> ולוחצים חיבור.</li>
-    <li>בוחרים תוכן: <b>פוסט</b>, <b>ריל</b> או <b>סטורי</b>. אפשר לבחור כמה, או "כל הפוסטים".</li>
-    <li>כותבים מילות תגובה (למשל "לינק"), את הלינק והודעה פרטית, ובוחרים אם לשלוח רק לעוקבים.</li>
-    <li>שומרים. האוטומציה מופיעה ב"רצות עכשיו" בסיידבר, והקוביות מציגות את הספירות.</li>
-  </ol>
-  <div class="ok"><b>איך יודעים שהצליח:</b> האוטומציה פעילה ברשימה, והפוסטים שלך נטענו.</div>
+  <div class="step-head"><span class="num">6</span><h2>טוקן Cloudflare לפריסה</h2><span class="who">אצלך, Claude פותח טופס</span></div>
+  <ol><li>נכנסים ל-<a href="https://dash.cloudflare.com/profile/api-tokens">dash.cloudflare.com/profile/api-tokens</a>, ואז <b>Create Token</b>.</li>
+  <li>ליד <b>Edit Cloudflare Workers</b>, לוחצים <b>Use template</b>.</li>
+  <li>ב-<b>Account policy</b> בוחרים את החשבון שלך. ב-<b>Token expiration</b> בוחרים <b>30 days</b>.</li>
+  <li><b>Continue to summary</b>, ואז <b>Create Token</b>, ומעתיקים את הטוקן (מוצג פעם אחת).</li>
+  <li>מדביקים אותו <b>בטופס המאובטח</b> ש-Claude פותח, ולא בצ'אט. ב-Claude Code מקומי מספיק <code dir="ltr">npx wrangler login</code>.</li></ol><div class="shot">צילום מסך: יצירת הטוקן מהתבנית</div>
+  <p class="ok"><b>איך יודעים שהצליח:</b> Claude כותב שהטוקן תקין ומציג את שם החשבון.</p>
   <label class="check"><input type="checkbox"> סיימתי את השלב</label>
 </section>
-
 <section class="step" id="s7" data-step="7">
-  <div class="step-head"><span class="num">7</span><h2>בדיקת קבלה אמיתית</h2></div>
-  <div class="note"><b>חשוב:</b> לפי התיעוד של Meta, התראות על תגובות של גולשים מגיעות רק כשהאפליקציה במצב <b>Live</b> עם <b>Advanced Access</b> (App Review), ולייצור גם אימות עסק. כל עוד היא ב-Development אפשר לוודא את החיבור (אימות ה-webhook, התראת בדיקה מהלוח, <code dir="ltr">/health</code>, טעינת הפוסטים), אבל תגובה אמיתית של גולש עשויה לא להגיע. במקרה כזה השלב הבא הוא להגיש App Review.</div>
-  <ol>
-    <li>מהחשבון שלך, או מחשבון עם תפקיד באפליקציה (App roles), מגיבים על פוסט ציבורי במילת הטריגר.</li>
-    <li>אם ההתראה מגיעה: ההודעה הפרטית מגיעה <b>פעם אחת בלבד</b> (הודעה אחת לכל תגובה, בתוך 7 ימים מהתגובה).</li>
-    <li>אם הוגדרה בדיקת עוקב: מי שלא עוקב מקבל בקשה עם כפתור, ורק אחרי שעקב ולחץ מקבל את הלינק.</li>
-    <li>אין התראה? בלוח של Cloudflare: Workers &amp; Pages, ה-Worker, Observability. אם לא הגיעה בקשה, הסיבה כמעט תמיד אחת המגבלות בשלב 5.</li>
-  </ol>
-  <div class="ok"><b>ההקמה גמורה</b> כשתגובה אמיתית הביאה הודעה פרטית. אם האפליקציה עוד לא Live, מה שנשאר הוא האישור של Meta.</div>
+  <div class="step-head"><span class="num">7</span><h2>פריסת הדשבורד</h2><span class="who">Claude</span></div>
+  <p>Claude מציג את שם חשבון ה-Cloudflare ומבקש אישור. אחרי "כן" הוא מריץ בדיקות ופורס. בסוף מתקבלת כתובת כמו <code dir="ltr">https://d-me.שם.workers.dev</code>.</p>
+  <p class="ok"><b>איך יודעים שהצליח:</b> הכתובת עם <code dir="ltr">/health</code> בסוף מחזירה ok.</p>
   <label class="check"><input type="checkbox"> סיימתי את השלב</label>
 </section>
-
 <section class="step" id="s8" data-step="8">
-  <div class="step-head"><span class="num">8</span><h2>תחזוקה</h2></div>
-  <h3>חידוש הטוקן, כל כ-50 יום</h3>
-  <p>בודקים בלוח של Meta מה תוקף הטוקן. אם הוא פג אחרי כ-60 יום, מרעננים כשבועיים לפני ומוסיפים תזכורת ביומן (טוקן של משתמש מערכת לא פג). קריאה אחת מחזירה טוקן חדש:</p>
-  <div class="code"><button class="copy" type="button">העתקה</button><pre>https://graph.instagram.com/refresh_access_token?grant_type=ig_refresh_token&amp;access_token=&lt;הטוקן הנוכחי&gt;</pre></div>
-  <p>ואז שומרים אותו (מקלידים בהזנה מוסתרת):</p>
-  <div class="code"><button class="copy" type="button">העתקה</button><pre>npx wrangler secret put IG_ACCESS_TOKEN --config wrangler.local.jsonc</pre></div>
-  <h3>החלפת סיסמת הניהול</h3>
-  <div class="code"><button class="copy" type="button">העתקה</button><pre>npx wrangler secret put ADMIN_TOKEN --config wrangler.local.jsonc</pre></div>
-  <h3>עדכון גרסה</h3>
-  <div class="code"><button class="copy" type="button">העתקה</button><pre>git pull
+  <div class="step-head"><span class="num">8</span><h2>סיסמת הדשבורד</h2><span class="who">בחירה שלך, או Claude יוצר</span></div>
+  <p>הסיסמה מגינה על הדשבורד. אפשר לבחור סיסמה בעצמך (12 תווים לפחות), או ש-Claude ייצור סיסמה חזקה וישלח אותה בקובץ. כדאי לשמור אותה במנהל סיסמאות.</p>
+  <p class="ok"><b>איך יודעים שהצליח:</b> Claude כותב שהסיסמה הוגדרה.</p>
+  <label class="check"><input type="checkbox"> סיימתי את השלב</label>
+</section>
+<section class="step" id="s9" data-step="9">
+  <div class="step-head"><span class="num">9</span><h2>מפתח Zernio לדשבורד</h2><span class="who">אצלך</span></div>
+  <ol><li>ב-<a href="https://zernio.com/dashboard/api-keys">zernio.com/dashboard/api-keys</a> יוצרים מפתח בשם <b>D-ME</b> ומעתיקים.</li>
+  <li><b>מומלץ:</b> ב-Cloudflare: Workers &amp; Pages, ואז d-me, ואז Settings, ואז Variables and Secrets, ואז Add, סוג Secret, שם <code dir="ltr">ZERNIO_API_KEY</code>, ואז Deploy.</li>
+  <li><b>או</b> מדביקים אותו ל-Claude, והוא מכניס אותו. המפתח יישאר בהיסטוריית השיחה.</li></ol><div class="code"><button class="copy" type="button">העתקה</button><pre>ZERNIO_API_KEY</pre></div><div class="shot">צילום מסך: הוספת Secret ב-Cloudflare</div>
+  <p class="ok"><b>איך יודעים שהצליח:</b> Claude מציג את שם החשבון ואת מספר הפוסטים מהדשבורד.</p>
+  <label class="check"><input type="checkbox"> סיימתי את השלב</label>
+</section>
+<section class="step" id="s10" data-step="10">
+  <div class="step-head"><span class="num">10</span><h2>כניסה ובדיקה ראשונה בטוחה</h2><span class="who">יחד עם Claude</span></div>
+  <ol><li>נכנסים לכתובת עם <code dir="ltr">/admin</code> בסוף.</li><li>מדביקים את הסיסמה ב"מפתח ניהול" בתחתית התפריט, ולוחצים חיבור.</li>
+  <li>בדיקה: בוחרים פוסט <b>ישן</b> ומילה ייחודית כמו "בדיקה 7", שומרים כמושהית, ומפעילים אחרי אישור.</li>
+  <li>מגיבים במילה <b>מחשבון אינסטגרם אחר</b>, ובודקים שהגיעו תגובה והודעה עם לינק.</li><li>משהים את האוטומציה בסוף.</li></ol>
+  <p class="ok"><b>איך יודעים שהצליח:</b> ההודעה עם הלינק הגיעה, והמספרים עלו ב"האוטומציות שלי".</p>
+  <label class="check"><input type="checkbox"> סיימתי את השלב</label>
+</section>
+<section class="step" id="s11" data-step="11">
+  <div class="step-head"><span class="num">11</span><h2>שימוש שוטף</h2><span class="who">אצלך</span></div>
+  <h3>בדשבורד</h3><ul><li><b>יצירת אוטומציה:</b> פוסטים, מילה או "כל תגובה", תגובה פומבית, שער עוקבים, הודעה ולינק.</li><li><b>יצירת פוסט:</b> עד 10 פריטים, תיאור, תמונת שער, אוטומציה, פרסום עכשיו או מתוזמן.</li><li><b>פרסומים מתוזמנים, אנליטיקות, חיבורים ושימוש.</b></li></ul>
+  <h3>דרך Claude</h3><div class="code he"><button class="copy" type="button">העתקה</button><pre>תזמן פוסט ליום ראשון ב-10:00 עם התמונה הזאת, ומי שמגיב "מדריך" יקבל את הלינק, רק לעוקבים.</pre></div>
+  <h3>עדכון גרסה</h3><div class="code"><button class="copy" type="button">העתקה</button><pre>git pull
 npm test
-npm run deploy</pre></div>
-  <h3>תקלות נפוצות</h3>
-  <div class="table-wrap"><table>
-    <thead><tr><th>תופעה</th><th>סיבה נפוצה</th><th>מה עושים</th></tr></thead>
-    <tbody>
-      <tr><td><code dir="ltr">/health</code> לא עונה</td><td>הפריסה לא הסתיימה</td><td>מחכים דקה, בודקים ב-Workers &amp; Pages</td></tr>
-      <tr><td>כניסה לדשבורד נכשלת</td><td>סיסמה לא נכונה</td><td>מחליפים ADMIN_TOKEN</td></tr>
-      <tr><td>הפוסטים לא נטענים</td><td>טוקן לא נכון או פג, או חסרה הרשאה</td><td>מייצרים טוקן חדש ומזינים שוב</td></tr>
-      <tr><td>Webhook מחזיר 401</td><td>app secret לא תואם</td><td>ראו שלב 5</td></tr>
-      <tr><td>אין אירועים מגולשים</td><td>האפליקציה ב-Development</td><td>שלב 7, מצב Live ו-App Review</td></tr>
-      <tr><td>הודעה כפולה</td><td>אירוע חוזר מ-Meta</td><td>המערכת מונעת כפילויות לפי מזהה. בודקים בלוגים</td></tr>
-    </tbody>
-  </table></div>
+npx wrangler deploy</pre></div>
+  <p class="ok"><b>איך יודעים שהצליח:</b> הכול עובד, ואפשר לנהל מהדשבורד או מ-Claude.</p>
   <label class="check"><input type="checkbox"> סיימתי את השלב</label>
 </section>
 </main>
 
 <nav aria-label="שלבים" id="nav"></nav>
-<footer>הפרטים המלאים לסוכן נמצאים ב-<a href="AGENT_PLAYBOOK_HE.md">AGENT_PLAYBOOK_HE.md</a>. הפונט Heebo ברישיון SIL Open Font License.</footer>
+<footer>התסריט המלא לסוכן: <a href="AGENT_PLAYBOOK_HE.md">AGENT_PLAYBOOK_HE.md</a>. הפונט Rubik ברישיון SIL Open Font License.</footer>
 </div>
 <script>
 (function(){
