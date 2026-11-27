@@ -15,6 +15,7 @@ const ICONS = {
   plug: '<path d="M9 2v6M15 2v6M6 8h12v4a6 6 0 0 1-12 0zM12 18v4"/>',
   chevron: '<path d="M6 9l6 6 6-6"/>',
   plus: '<path d="M12 5v14M5 12h14"/>',
+  send: '<path d="M21 3L3 9.5l7.5 3L13 21z"/><path d="M21 3l-10.5 9.5"/>',
 };
 
 function icon(name: keyof typeof ICONS): string {
@@ -43,11 +44,12 @@ const HTML = `<!doctype html>
   <meta name="viewport" content="width=device-width,initial-scale=1">
   <meta name="color-scheme" content="light">
   <title>D-ME - Instagram Automation Studio</title>
+  <link rel="icon" href="data:image/svg+xml,%3Csvg%20xmlns%3D%27http%3A//www.w3.org/2000/svg%27%20viewBox%3D%270%200%2032%2032%27%3E%3Crect%20x%3D%272%27%20y%3D%272%27%20width%3D%2728%27%20height%3D%2728%27%20rx%3D%278%27%20fill%3D%27%23ffd84a%27%20stroke%3D%27%23111%27%20stroke-width%3D%273%27/%3E%3Cpath%20d%3D%27M24%208L7%2013.5l7%203L16.5%2024z%20M24%208l-10%208.5%27%20fill%3D%27none%27%20stroke%3D%27%23111%27%20stroke-width%3D%272.6%27%20stroke-linejoin%3D%27round%27%20stroke-linecap%3D%27round%27/%3E%3C/svg%3E">
   <link rel="stylesheet" href="/admin/styles.css">
 </head>
 <body>
   <aside class="side" aria-label="תפריט">
-    <a class="brand" href="/admin"><span class="brand-name">D-ME</span><small>Instagram Automation Studio</small></a>
+    <a class="brand" href="/admin" aria-label="D-ME"><span class="logo"><span class="logo-mark">${icon("send")}</span><span class="brand-name">D-ME</span></span><small>Instagram Automation Studio</small></a>
     <nav class="nav" aria-label="ניווט">
       <button class="nav-tab active" data-view="automation" type="button">${icon("bolt")}<span>יצירת אוטומציה</span></button>
       <button class="nav-tab" data-view="post" type="button">${icon("image")}<span>יצירת פוסט</span></button>
@@ -209,8 +211,11 @@ svg{display:block;width:22px;height:22px;flex:none}
 
 .side{position:fixed;inset:24px 24px 24px auto;z-index:20;width:var(--side-w);display:flex;flex-direction:column;gap:20px;padding:24px 20px;background:var(--side);border:var(--bw) solid var(--ink);border-radius:var(--r-card);box-shadow:var(--shadow);overflow:hidden}
 .brand{display:flex;flex-direction:column;color:var(--ink);text-decoration:none}
-.brand-name{font-size:34px;font-weight:700;letter-spacing:-.02em;line-height:1}
-.brand small{margin-top:6px;color:var(--text-2);font-size:var(--fs-xs);font-weight:500}
+.logo{direction:ltr;align-self:flex-start;display:inline-flex;align-items:center;gap:12px;padding:8px 22px 8px 8px;background:var(--surface);border:3px solid var(--ink);border-radius:22px;box-shadow:6px 6px 0 var(--tomato),6px 6px 0 3px var(--ink)}
+.logo-mark{display:grid;place-items:center;width:52px;height:52px;background:#fbc52b;border:3px solid var(--ink);border-radius:14px}
+.logo-mark svg{width:30px;height:30px;stroke-width:2.6}
+.brand-name{font-size:40px;font-weight:900;font-style:italic;letter-spacing:-.01em;line-height:1}
+.brand small{margin-top:14px;color:var(--text-2);font-size:var(--fs-xs);font-weight:500}
 .nav{display:grid;gap:6px}
 .nav-tab{display:flex;align-items:center;gap:10px;width:100%;min-height:48px;padding:10px 12px;border:var(--bw) solid transparent;border-radius:var(--r-sm);font-weight:500;font-size:var(--fs-sm);text-align:right}
 .nav-tab:hover{background:var(--surface)}
@@ -391,7 +396,7 @@ input:focus-visible+.switch{outline:3px solid var(--cobalt);outline-offset:2px}
 @media(max-width:640px){
 :root{--pad:16px;--gap:16px;--r-inner:10px;--fs-xs:12px;--fs-sm:14px;--fs-md:15px;--fs-lg:17px;--fs-h2:19px;--fs-kpi:26px;--shadow:4px 4px 0 var(--ink)}
 .side{position:static;inset:auto;width:auto;margin:16px 16px 0;padding:16px;gap:12px;overflow:visible}
-.brand-name{font-size:26px}
+.brand-name{font-size:28px}.logo{gap:8px;padding:5px 14px 5px 5px;border-radius:16px}.logo-mark{width:38px;height:38px;border-radius:10px}.logo-mark svg{width:22px;height:22px}.brand small{display:none}
 .nav{grid-auto-flow:column;grid-auto-columns:max-content;overflow-x:auto;padding:2px 2px 8px}
 .nav-tab{min-height:40px;padding:6px 10px;white-space:nowrap}
 .rail-summary{display:none}
