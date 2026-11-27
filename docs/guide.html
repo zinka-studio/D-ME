@@ -84,26 +84,26 @@ footer{grid-column:1/-1;color:var(--text-2);font-size:.875rem;padding-top:8px}
 - סיסמאות של חשבונות אני מקליד רק באתרים עצמם, לא בצ'אט.
 - לפני פרסום, תזמון, יצירה או הפעלה של אוטומציה, או פריסה, תציג לי את הפרטים המדויקים ותחכה ל"כן".
 - אם משהו נכשל, תסביר בשפה פשוטה מה קרה ומה עושים.</pre></div>
-  <p>השלבים שלמטה הם אותם שלבים, כדי לראות מה הולך לקרות או ללכת לבד.</p>
+  <p>השלבים שלמטה הם אותם שלבים, כדי לראות מה הולך לקרות או ללכת לבד. Claude עושה בעצמו כל מה שאפשר, ואם משהו לא ברור, הוא יבקש צילום מסך ויכוון.</p>
 </section>
 
 <section class="step" id="s0" data-step="0">
   <div class="step-head"><span class="num">0</span><h2>חשבון אינסטגרם מקצועי</h2><span class="who">אצלך</span></div>
   <ol><li>באינסטגרם: פרופיל, ואז ☰, ואז הגדרות, ואז "סוג החשבון וכלים".</li><li>צריך להיות כתוב <b>חשבון עסקי</b> או <b>חשבון יוצר</b>. אם לא, "מעבר לחשבון מקצועי" (חינמי).</li><li>החשבון צריך להיות ציבורי.</li></ol>
-  <div class="shot">צילום מסך: סוג החשבון באינסטגרם</div>
+  
   <p class="ok"><b>איך יודעים שהצליח:</b> כתוב "עסקי" או "יוצר".</p>
   <label class="check"><input type="checkbox"> סיימתי את השלב</label>
 </section>
 <section class="step" id="s1" data-step="1">
   <div class="step-head"><span class="num">1</span><h2>חשבון Zernio</h2><span class="who">אצלך</span></div>
   <p>Zernio מחזיקה את החיבור לאינסטגרם ושולחת את ההודעות, גם כשהמחשב כבוי.</p>
-  <ol><li>נרשמים ב-<a href="https://zernio.com/signup">zernio.com/signup</a>.</li><li>בוחרים תוכנית לפי האתר שלהם.</li></ol><div class="shot">צילום מסך: הלוח של Zernio</div>
+  <ol><li>נרשמים ב-<a href="https://zernio.com/signup">zernio.com/signup</a>.</li><li>בוחרים תוכנית לפי האתר שלהם.</li></ol>
   <p class="ok"><b>איך יודעים שהצליח:</b> נמצאים בתוך הלוח של Zernio.</p>
   <label class="check"><input type="checkbox"> סיימתי את השלב</label>
 </section>
 <section class="step" id="s2" data-step="2">
   <div class="step-head"><span class="num">2</span><h2>חיבור האינסטגרם ל-Zernio</h2><span class="who">אצלך</span></div>
-  <ol><li>בלוח של Zernio: Accounts, ואז Connect, ואז Instagram.</li><li>מתחברים לאינסטגרם ומאשרים. הסיסמה מוקלדת רק באינסטגרם.</li></ol><div class="shot">צילום מסך: החשבון מחובר ב-Zernio</div>
+  <ol><li>בלוח של Zernio: Accounts, ואז Connect, ואז Instagram.</li><li>מתחברים לאינסטגרם ומאשרים. הסיסמה מוקלדת רק באינסטגרם.</li></ol>
   <p class="ok"><b>איך יודעים שהצליח:</b> החשבון מופיע כמחובר.</p>
   <label class="check"><input type="checkbox"> סיימתי את השלב</label>
 </section>
@@ -114,7 +114,7 @@ footer{grid-column:1/-1;color:var(--text-2);font-size:.875rem;padding-top:8px}
   <ol><li>נכנסים ל-<a href="https://claude.ai/customize/connectors">claude.ai/customize/connectors</a>.</li><li>Add custom connector, ובו הכתובת:</li></ol>
   <div class="code"><button class="copy" type="button">העתקה</button><pre>https://mcp.zernio.com/mcp</pre></div>
   <ol start="3"><li>מתחברים ומאשרים, ופותחים <b>שיחה חדשה</b>.</li></ol>
-  <h3>ב-Claude Code</h3><div class="code"><button class="copy" type="button">העתקה</button><pre>claude mcp add --transport http zernio https://mcp.zernio.com/mcp</pre></div><div class="shot">צילום מסך: הוספת מחבר מותאם</div>
+  <h3>ב-Claude Code</h3><div class="code"><button class="copy" type="button">העתקה</button><pre>claude mcp add --transport http zernio https://mcp.zernio.com/mcp</pre></div>
   <p class="ok"><b>איך יודעים שהצליח:</b> Claude כותב שהוא רואה את החשבון שלך (שלב 4).</p>
   <label class="check"><input type="checkbox"> סיימתי את השלב</label>
 </section>
@@ -136,7 +136,7 @@ footer{grid-column:1/-1;color:var(--text-2);font-size:.875rem;padding-top:8px}
   <li>ליד <b>Edit Cloudflare Workers</b>, לוחצים <b>Use template</b>.</li>
   <li>ב-<b>Account policy</b> בוחרים את החשבון שלך. ב-<b>Token expiration</b> בוחרים <b>30 days</b>.</li>
   <li><b>Continue to summary</b>, ואז <b>Create Token</b>, ומעתיקים את הטוקן (מוצג פעם אחת).</li>
-  <li>מדביקים אותו <b>בטופס המאובטח</b> ש-Claude פותח, ולא בצ'אט. ב-Claude Code מקומי מספיק <code dir="ltr">npx wrangler login</code>.</li></ol><div class="shot">צילום מסך: יצירת הטוקן מהתבנית</div>
+  <li>מדביקים אותו <b>בטופס המאובטח</b> ש-Claude פותח, ולא בצ'אט. ב-Claude Code מקומי מספיק <code dir="ltr">npx wrangler login</code>.</li></ol>
   <p class="ok"><b>איך יודעים שהצליח:</b> Claude כותב שהטוקן תקין ומציג את שם החשבון.</p>
   <label class="check"><input type="checkbox"> סיימתי את השלב</label>
 </section>
@@ -156,7 +156,7 @@ footer{grid-column:1/-1;color:var(--text-2);font-size:.875rem;padding-top:8px}
   <div class="step-head"><span class="num">9</span><h2>מפתח Zernio לדשבורד</h2><span class="who">אצלך</span></div>
   <ol><li>ב-<a href="https://zernio.com/dashboard/api-keys">zernio.com/dashboard/api-keys</a> יוצרים מפתח בשם <b>D-ME</b> ומעתיקים.</li>
   <li><b>מומלץ:</b> ב-Cloudflare: Workers &amp; Pages, ואז d-me, ואז Settings, ואז Variables and Secrets, ואז Add, סוג Secret, שם <code dir="ltr">ZERNIO_API_KEY</code>, ואז Deploy.</li>
-  <li><b>או</b> מדביקים אותו ל-Claude, והוא מכניס אותו. המפתח יישאר בהיסטוריית השיחה.</li></ol><div class="code"><button class="copy" type="button">העתקה</button><pre>ZERNIO_API_KEY</pre></div><div class="shot">צילום מסך: הוספת Secret ב-Cloudflare</div>
+  <li><b>או</b> מדביקים אותו ל-Claude, והוא מכניס אותו. המפתח יישאר בהיסטוריית השיחה.</li></ol><div class="code"><button class="copy" type="button">העתקה</button><pre>ZERNIO_API_KEY</pre></div>
   <p class="ok"><b>איך יודעים שהצליח:</b> Claude מציג את שם החשבון ואת מספר הפוסטים מהדשבורד.</p>
   <label class="check"><input type="checkbox"> סיימתי את השלב</label>
 </section>
