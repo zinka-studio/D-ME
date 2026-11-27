@@ -121,28 +121,27 @@ npx wrangler whoami</pre></div>
 <section class="step" id="s3" data-step="3">
   <div class="step-head"><span class="num">3</span><h2>חשבון מפתחים ואפליקציה ב-Meta</h2></div>
   <p>האפליקציה היא מה שמאשר ל-D-ME לקרוא תגובות ולשלוח הודעות מהחשבון שלך.</p>
-  <div class="note"><b>שינוי של Meta (אוקטובר 2026):</b> אפליקציות חדשות עובדות עם <b>Unified login</b> ולא עם "Instagram login" הישן. תראו בדף ה-use case את ההודעה "API setup with Instagram login is not available for newer apps". ההרשאות נקראות <code dir="ltr">instagram_basic</code>, <code dir="ltr">instagram_manage_comments</code>, <code dir="ltr">instagram_manage_messages</code>, והטוקן הוא של <b>משתמש מערכת</b> בתוך Business Portfolio. ההתקנה בשלב 4 בודקת בעצמה מול Meta מה עובד.</div>
+  <div class="note"><b>שינוי של Meta (נובמבר 2026):</b> אפליקציות חדשות לא מקבלות "Instagram login" אלא <b>Unified Login</b>: כתובת <code dir="ltr">graph.facebook.com</code>, הרשאות <code dir="ltr">instagram_basic</code>, <code dir="ltr">instagram_manage_messages</code>, <code dir="ltr">instagram_manage_comments</code>, וטוקן של Business Portfolio. אפליקציה ישנה שכבר קיימת ממשיכה לעבוד. ההתקנה בשלב 4 מוצאת בעצמה את הכתובת ואת מזהה החשבון.</div>
   <ol>
     <li>נכנסים ל-<a href="https://developers.facebook.com" target="_blank" rel="noopener">developers.facebook.com</a>, מתחברים, ועוברים הרשמה כמפתח (כולל אימות).</li>
-    <li>יש כבר אפליקציה ישנה עם Instagram login ב-My Apps? אפשר להשתמש בה. אחרת <b>Create App</b>, use case: <b>Manage messaging &amp; content on Instagram</b>.</li>
-    <li>שם האפליקציה: בלי "Insta", "IG" או "gram" (Meta חוסמת). אימייל קשר: שלך.</li>
-    <li>חיבור <b>Business Portfolio</b> (אפשר ליצור אחד בחינם). לעיתים מופיעה פעם אחת "Verification Required", ובניסיון נוסף זה מצליח.</li>
-    <li>את ה-<b>App secret</b> מוצאים ב-App settings &gt; Basic. שומרים בצד.</li>
-    <li><b>טוקן:</b> ב-<a href="https://business.facebook.com/settings" target="_blank" rel="noopener">Meta Business Settings</a> של אותו Portfolio: Users &gt; System users &gt; Add (Admin). מוסיפים לו נכסים: את האפליקציה ואת חשבון האינסטגרם. אחר כך <b>Generate new token</b>: בוחרים את האפליקציה, תוקף (עדיף "Never" אם יש), וההרשאות <code dir="ltr">instagram_basic</code>, <code dir="ltr">instagram_manage_comments</code>, <code dir="ltr">instagram_manage_messages</code>. שומרים את הטוקן בצד. <b>לא מדביקים בצ'אט.</b></li>
-    <li>רושמים את ה-<b>Instagram account ID</b> המספרי של החשבון המקצועי (לא סוד).</li>
+    <li><b>Create App</b> עם ה-use case <b>Manage messaging &amp; content on Instagram</b>. שם האפליקציה: בלי "Insta", "IG" או "gram". האפליקציה חייבת להיות בבעלות <b>Business Portfolio</b> (אפשר ליצור אחד בחינם). לעיתים מופיעה פעם אחת "Verification Required", ובניסיון נוסף זה מצליח.</li>
+    <li>בלוח האפליקציה: <b>Use cases &gt; Manage messaging &amp; content on Instagram &gt; Customize &gt; API setup with Unified login</b>.</li>
+    <li><b>Configure your app:</b> Create new configuration. ב-<b>Edit permissions</b> משאירים רק <code dir="ltr">instagram_basic</code>, <code dir="ltr">instagram_manage_messages</code>, <code dir="ltr">instagram_manage_comments</code>, ואז Use this configuration. ב-Redirect URL מזינים כתובת HTTPS כלשהי ושומרים (D-ME לא משתמש בה). רושמים את סוג הטוקן ותוקפו מהתצוגה המקדימה.</li>
+    <li><b>Generate access tokens:</b> Add account, ומזמינים את חשבון האינסטגרם כ-<b>Instagram Tester</b>. מאשרים את ההזמנה באינסטגרם באתר: Settings &gt; Website permissions &gt; Apps and websites &gt; <b>Tester Invites</b>. אחר כך <b>Generate token</b>, ומעתיקים את הטוקן: <b>הוא מוצג פעם אחת בלבד</b>. שומרים בצד. <b>לא מדביקים בצ'אט.</b></li>
+    <li>את ה-<b>App secret</b> מוצאים ב-App settings &gt; Basic. משתמשים ב-ID וב-secret של אפליקציית Meta, ולא של Instagram. שומרים בצד.</li>
   </ol>
-  <div class="ok"><b>איך יודעים שהצליח:</b> ידועים לך ה-Instagram account ID, הטוקן (ותוקפו) וה-app secret.</div>
-  <p class="stuck">שמות המסכים ב-Meta משתנים, ושלבים 6 ו-7 מבוססים על הנוהל הרגיל של משתמשי מערכת. אם משהו שונה ממה שאתם רואים, תתאימו למסך. אם ההתקנה בשלב 4 מודיעה ש-Meta דחתה את הטוקן, תעתיקו את ההודעה שלה ותשלחו אותה למי שמתחזק את הריפו.</p>
+  <div class="ok"><b>איך יודעים שהצליח:</b> יש טוקן ו-app secret שמורים בצד, ורשום תוקף הטוקן. מזהה החשבון לא נדרש: ההתקנה מוצאת אותו.</div>
+  <p class="stuck">הלשונית "API setup with Unified login" לא מופיעה? האפליקציה לא בבעלות Business Portfolio. ה-Tester לא מופיע בטבלה? ההזמנה לא אושרה באינסטגרם באתר. חשבונות בדיקה (test users) לא נתמכים, צריך חשבון מקצועי אמיתי.</p>
   <label class="check"><input type="checkbox"> סיימתי את השלב</label>
 </section>
 
 <section class="step" id="s4" data-step="4">
   <div class="step-head"><span class="num">4</span><h2>ההתקנה</h2></div>
   <p>מריצים <b>בטרמינל שלך</b>. הסקריפט יוצר מסד נתונים, מפעיל מיגרציות, שומר את הסודות ב-Cloudflare ופורס. הוא שואל בהזנה מוסתרת את הטוקן ואת ה-app secret.</p>
-  <div class="code"><button class="copy" type="button">העתקה</button><pre>npm run setup -- --apply --instagram-user-id &lt;ה-Instagram account ID&gt;</pre></div>
+  <div class="code"><button class="copy" type="button">העתקה</button><pre>npm run setup -- --apply</pre></div>
   <ol>
     <li>הסקריפט מציג את חשבון ה-Cloudflare. מקלידים <code>yes</code> אם זה הנכון.</li>
-    <li>מקלידים את הטוקן ואת ה-app secret כשנשאל (לא רואים אותם בזמן ההקלדה, וזה תקין). הסקריפט בודק את הטוקן מול Meta לפני שהוא יוצר משהו בענן.</li>
+    <li>מקלידים את הטוקן ואת ה-app secret כשנשאל (לא רואים אותם בזמן ההקלדה, וזה תקין). הסקריפט בודק את הטוקן מול Meta, מוצא בעצמו את חשבון האינסטגרם, ורק אז יוצר משהו בענן.</li>
     <li>בסוף הוא גם מנסה לרשום את החשבון לאירועי תגובות והודעות. מוצגות כתובת הדשבורד וכתובת ה-webhook.</li>
     <li>הסיסמה וה-Verify token נשמרים בקובץ <code dir="ltr">d-me-tokens.txt</code>. פותחים אותו בעצמך, מעתיקים למנהל סיסמאות, ומוחקים אותו.</li>
   </ol>
@@ -155,14 +154,14 @@ npx wrangler whoami</pre></div>
   <div class="step-head"><span class="num">5</span><h2>חיבור ה-webhook ב-Meta</h2></div>
   <p>ככה האינסטגרם שולחת ל-D-ME כל תגובה והודעה חדשה.</p>
   <ol>
-    <li>באפליקציה ב-Meta, באותו מסך API setup, בחלק <b>Configure webhooks</b>.</li>
-    <li><b>Callback URL:</b> כתובת ה-webhook משלב 4 (נגמרת ב-<code dir="ltr">/webhook/instagram</code>).</li>
-    <li><b>Verify token:</b> הערך מהקובץ <code dir="ltr">d-me-tokens.txt</code>. לוחצים <b>Verify and save</b>.</li>
-    <li>מסמנים את האירועים <b>comments</b> ו-<b>messages</b>.</li>
-    <li>שני דברים שונים: ה-webhook של האפליקציה (עכשיו), ו<b>מנוי של החשבון</b> לאירועים. את המנוי ההתקנה ניסתה לעשות בעצמה. אם היא כשלה, מפעילים אותו בלוח של Meta. בלי מנוי של החשבון ה-webhook שקט.</li>
+    <li>באפליקציה ב-Meta: <b>API setup with Unified login &gt; Configure webhooks</b>.</li>
+    <li><b>Callback URL:</b> כתובת ה-webhook משלב 4 (נגמרת ב-<code dir="ltr">/webhook/instagram</code>). <b>Verify token:</b> הערך מהקובץ <code dir="ltr">d-me-tokens.txt</code>. לוחצים <b>Verify and save</b>.</li>
+    <li>מסמנים את השדות <b>comments</b> ו-<b>messages</b>.</li>
+    <li>שני דברים שונים: ה-webhook של האפליקציה (עכשיו), ו<b>מנוי של החשבון</b> לאירועים. את המנוי ההתקנה כבר ניסתה לעשות בעצמה. בלי מנוי של החשבון ה-webhook שקט.</li>
   </ol>
   <div class="ok"><b>איך יודעים שהצליח:</b> Meta מאשרת את ה-Callback בלי שגיאה.</div>
-  <p class="stuck">Meta לא מאשרת: בודקים שה-Verify token והכתובת תואמים. אם אחר כך אירועים מקבלים 401: ה-app secret שהוזן אינו זה ש-Meta חותמת איתו. מנסים את ה-App secret של האפליקציה (App settings, Basic) ומחליפים:</p>
+  <div class="note"><b>מגבלות מהתיעוד של Meta:</b> האפליקציה חייבת להיות <b>Live</b> כדי לקבל התראות מגולשים. התראות על תגובות דורשות <b>Advanced Access</b> (App Review), ולייצור גם אימות עסק. החשבון חייב להיות <b>ציבורי</b>. ויש מגבלה זמנית: אם חשבון האינסטגרם לא מקושר לדף פייסבוק, התראות הודעות (כולל תגובות לסטורי וכפתור "עקבתי") עשויות לא להגיע. הפתרון של Meta: configuration נפרד שמבקש גם את הדף המקושר וההרשאה <code dir="ltr">pages_show_list</code>.</div>
+  <p class="stuck">אם Meta לא מאשרת: ה-Verify token שונה ממה שנשמר, או שהכתובת לא נכונה. אם אחר כך אירועים מקבלים 401: ה-app secret שהוזן אינו זה ש-Meta חותמת איתו. מנסים את ה-App secret של האפליקציה (App settings, Basic) ומחליפים:</p>
   <div class="code"><button class="copy" type="button">העתקה</button><pre>npx wrangler secret put IG_APP_SECRET --config wrangler.local.jsonc</pre></div>
   <label class="check"><input type="checkbox"> סיימתי את השלב</label>
 </section>
@@ -181,16 +180,14 @@ npx wrangler whoami</pre></div>
 
 <section class="step" id="s7" data-step="7">
   <div class="step-head"><span class="num">7</span><h2>בדיקת קבלה אמיתית</h2></div>
-  <div class="note"><b>חשוב:</b> כל עוד האפליקציה ב-Meta במצב Development, אירועים מגיעים רק מחשבונות שיש להם תפקיד באפליקציה. לכן בודקים קודם מחשבון בודק: ב-Meta, App roles, מוסיפים חשבון אינסטגרם שני כ-<b>Instagram Tester</b>, והוא מאשר את ההזמנה בהגדרות האינסטגרם שלו.</div>
+  <div class="note"><b>חשוב:</b> לפי התיעוד של Meta, התראות על תגובות של גולשים מגיעות רק כשהאפליקציה במצב <b>Live</b> עם <b>Advanced Access</b> (App Review), ולייצור גם אימות עסק. כל עוד היא ב-Development אפשר לוודא את החיבור (אימות ה-webhook, התראת בדיקה מהלוח, <code dir="ltr">/health</code>, טעינת הפוסטים), אבל תגובה אמיתית של גולש עשויה לא להגיע. במקרה כזה השלב הבא הוא להגיש App Review.</div>
   <ol>
-    <li>מהחשבון הבודק מגיבים על הפוסט במילת הטריגר.</li>
-    <li>ההודעה הפרטית מגיעה <b>פעם אחת בלבד</b>.</li>
-    <li>אם הוגדרה בדיקת עוקב: חשבון שלא עוקב מקבל בקשה עם כפתור, ורק אחרי שעקב ולחץ מקבל את הלינק.</li>
-    <li>אם הוגדרה אוטומציה לסטורי: בודקים גם תגובה לסטורי.</li>
-    <li>לוגים: בלוח של Cloudflare, Workers &amp; Pages, ה-Worker, Observability.</li>
+    <li>מהחשבון שלך, או מחשבון עם תפקיד באפליקציה (App roles), מגיבים על פוסט ציבורי במילת הטריגר.</li>
+    <li>אם ההתראה מגיעה: ההודעה הפרטית מגיעה <b>פעם אחת בלבד</b> (הודעה אחת לכל תגובה, בתוך 7 ימים מהתגובה).</li>
+    <li>אם הוגדרה בדיקת עוקב: מי שלא עוקב מקבל בקשה עם כפתור, ורק אחרי שעקב ולחץ מקבל את הלינק.</li>
+    <li>אין התראה? בלוח של Cloudflare: Workers &amp; Pages, ה-Worker, Observability. אם לא הגיעה בקשה, הסיבה כמעט תמיד אחת המגבלות בשלב 5.</li>
   </ol>
-  <p><b>כדי שגולשים רגילים יפעילו את האוטומציה:</b> האפליקציה צריכה להיות במצב <b>Live</b>, ולעיתים נדרש <b>App Review</b> להרשאות ההודעות וה-comments, כולל כתובת מדיניות פרטיות. הדרישות של Meta משתנות, ולכן בודקים בתיעוד הרשמי שלהם בזמן ההקמה.</p>
-  <div class="ok"><b>ההקמה גמורה</b> רק אחרי שבדיקה מחשבון בודק עברה.</div>
+  <div class="ok"><b>ההקמה גמורה</b> כשתגובה אמיתית הביאה הודעה פרטית. אם האפליקציה עוד לא Live, מה שנשאר הוא האישור של Meta.</div>
   <label class="check"><input type="checkbox"> סיימתי את השלב</label>
 </section>
 

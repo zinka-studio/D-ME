@@ -97,18 +97,35 @@ function writeLocalConfig({ workerName, databaseName, databaseId, instagramUserI
   writeFileSync(localConfig, `${JSON.stringify(config, null, 2)}\n`);
 }
 
-// Meta serves new apps (Unified Login) and older apps (Instagram Login) from different hosts.
-// Ask both which one accepts this token for this account, instead of assuming.
-async function detectGraphHost(accessToken, instagramUserId, version) {
+// Meta serves new apps (Unified Login, graph.facebook.com) and older apps (Instagram Login,
+// graph.instagram.com) from different hosts. Ask both which one accepts this token, and which
+// Instagram professional accounts it covers, instead of assuming.
+async function graphGet(host, path, accessToken) {
+  const response = await fetch(`https://${host}/${path}`, { headers: { Authorization: `Bearer ${accessToken}` } });
+  const body = await response.json().catch(() => ({}));
+  return { ok: response.ok, body, message: body?.error?.message ?? String(response.status) };
+}
+
+export async function detectAccount(accessToken, version, wantedId) {
   const reasons = [];
-  for (const host of ["graph.instagram.com", "graph.facebook.com"]) {
+  for (const host of ["graph.facebook.com", "graph.instagram.com"]) {
     try {
-      const response = await fetch(`https://${host}/${version}/${instagramUserId}?fields=username`, {
-        headers: { Authorization: `Bearer ${accessToken}` },
-      });
-      const body = await response.json().catch(() => ({}));
-      if (response.ok) return { host, username: body.username ?? "" };
-      reasons.push(`${host}: ${body?.error?.message ?? response.status}`);
+      if (wantedId) {
+        const node = await graphGet(host, `${version}/${wantedId}?fields=username`, accessToken);
+        if (node.ok) return { host, accounts: [{ id: wantedId, username: node.body.username ?? "" }] };
+        reasons.push(`${host}: ${node.message}`);
+        continue;
+      }
+      if (host === "graph.facebook.com") {
+        const list = await graphGet(host, `${version}/me/assigned_instagram_accounts?fields=id,username`, accessToken);
+        if (list.ok && Array.isArray(list.body.data) && list.body.data.length) return { host, accounts: list.body.data };
+        reasons.push(`${host}: ${list.ok ? "no Instagram accounts are assigned to this token" : list.message}`);
+      } else {
+        const me = await graphGet(host, `${version}/me?fields=user_id,username`, accessToken);
+        const id = me.body.user_id ?? me.body.id;
+        if (me.ok && id) return { host, accounts: [{ id: String(id), username: me.body.username ?? "" }] };
+        reasons.push(`${host}: ${me.message}`);
+      }
     } catch (error) {
       reasons.push(`${host}: ${error.message}`);
     }
@@ -137,21 +154,18 @@ async function main() {
   let workerName = args.name ?? "d-me";
   let instagramUserId = args.instagramUserId ?? "";
   const location = args.location ?? "weur";
-  if (!instagramUserId && args.apply && process.stdin.isTTY) {
-    instagramUserId = await ask("Instagram professional account ID (digits only): ");
-  }
   if (!/^[a-z0-9](?:[a-z0-9-]{0,38}[a-z0-9])?$/.test(workerName)) throw new Error("--name must be lowercase letters, digits and hyphens.");
-  if (args.apply && !/^[0-9]+$/.test(instagramUserId)) throw new Error("--instagram-user-id must be the numeric Instagram account ID.");
+  if (instagramUserId && !/^[0-9]+$/.test(instagramUserId)) throw new Error("--instagram-user-id must be the numeric Instagram account ID.");
   if (!["weur", "eeur", "apac", "oc", "wnam", "enam"].includes(location)) throw new Error("--location must be one of weur, eeur, apac, oc, wnam, enam.");
   const databaseName = `${workerName}-db`;
 
   console.log("D-ME installation plan");
   console.log(`Worker:            ${workerName}`);
   console.log(`D1 database:       ${databaseName} (${location})`);
-  console.log(`Instagram user ID: ${instagramUserId || "(asked when --apply is used)"}`);
+  console.log(`Instagram user ID: ${instagramUserId || "(found automatically from the token)"}`);
   console.log("\nWhen --apply is used:");
   console.log("1. Show the Cloudflare account that wrangler is logged in to, and ask you to confirm it");
-  console.log("2. Ask for the Instagram access token and the Meta app secret (hidden input), and check the token with Meta");
+  console.log("2. Ask for the Instagram access token and the Meta app secret (hidden input), check the token with Meta and find the Instagram account ID");
   console.log("3. Run the tests and a dry deployment");
   console.log("4. Create the D1 database and apply the migrations");
   console.log("5. Generate the verify token and the admin password, saved to d-me-tokens.txt");
@@ -173,12 +187,21 @@ async function main() {
   const baseConfig = JSON.parse(readFileSync(join(root, "wrangler.jsonc"), "utf8"));
   const graphVersion = baseConfig.vars.IG_GRAPH_API_VERSION;
   console.log("\n[Checking the token with Meta]");
-  const detected = await detectGraphHost(accessToken, instagramUserId, graphVersion);
+  const detected = await detectAccount(accessToken, graphVersion, instagramUserId);
   if (!detected.host) {
-    throw new Error(`Meta did not accept this token for account ${instagramUserId}. Nothing was created. Check the token, the account ID and the permissions.\n  ${detected.reasons.join("\n  ")}`);
+    throw new Error(`Meta did not accept this token${instagramUserId ? ` for account ${instagramUserId}` : ""}. Nothing was created. Check the token and its permissions.\n  ${detected.reasons.join("\n  ")}`);
   }
   const graphHost = detected.host;
-  console.log(`Token accepted by ${graphHost}${detected.username ? ` for @${detected.username}` : ""}.`);
+  let account = detected.accounts[0];
+  if (detected.accounts.length > 1) {
+    console.log("The token covers several Instagram accounts:");
+    detected.accounts.forEach((item, index) => console.log(`  ${index + 1}. @${item.username} (${item.id})`));
+    const pick = Number(await ask("Which one should D-ME use? Type its number: "));
+    account = detected.accounts[pick - 1];
+    if (!account) throw new Error("No account chosen. Nothing was created.");
+  }
+  instagramUserId = account.id;
+  console.log(`Token accepted by ${graphHost} for @${account.username || account.id} (account ID ${instagramUserId}).`);
 
   if (!args.skipTests) await run("Tests", isWindows ? "npm.cmd" : "npm", ["test"]);
   await wrangler("Dry deployment", ["deploy", "--dry-run"]);
@@ -239,7 +262,9 @@ async function main() {
   console.log("Open that file yourself, copy both values to a password manager, then delete it. They are not printed here on purpose.");
 }
 
-main().catch((error) => {
-  console.error(`\nStopped: ${error.message}`);
-  process.exit(1);
-});
+if (process.argv[1] && resolve(process.argv[1]) === fileURLToPath(import.meta.url)) {
+  main().catch((error) => {
+    console.error(`\nStopped: ${error.message}`);
+    process.exit(1);
+  });
+}
