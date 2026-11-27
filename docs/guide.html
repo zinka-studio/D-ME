@@ -121,17 +121,19 @@ npx wrangler whoami</pre></div>
 <section class="step" id="s3" data-step="3">
   <div class="step-head"><span class="num">3</span><h2>חשבון מפתחים ואפליקציה ב-Meta</h2></div>
   <p>האפליקציה היא מה שמאשר ל-D-ME לקרוא תגובות ולשלוח הודעות מהחשבון שלך.</p>
+  <div class="note"><b>שינוי של Meta (אוקטובר 2026):</b> אפליקציות חדשות כבר לא מציעות "Instagram login" הישן, אלא <b>Unified Login</b>, דרך Business Portfolio. אפליקציה ישנה שכבר קיימת אצלך ב-My Apps ממשיכה לעבוד. אין צורך לדעת איזו דרך יש לך: ההתקנה בשלב 4 בודקת בעצמה מול Meta מה עובד.</div>
   <ol>
     <li>נכנסים ל-<a href="https://developers.facebook.com" target="_blank" rel="noopener">developers.facebook.com</a>, מתחברים, ועוברים הרשמה כמפתח (כולל אימות).</li>
-    <li><b>Create App.</b> שם האפליקציה: בלי "Insta", "IG" או "gram" (Meta חוסמת). אימייל קשר: שלך.</li>
-    <li>מוסיפים את המוצר <b>Instagram</b>, ובו <b>API setup with Instagram login</b>. השם עשוי להשתנות.</li>
-    <li><b>Add account:</b> מוסיפים את החשבון המקצועי ומאשרים באינסטגרם. נוצר <b>Instagram account ID</b> מספרי. רושמים אותו, הוא לא סוד.</li>
-    <li><b>Generate token</b> לחשבון (תוקף של כ-60 יום). שומרים בצד. <b>לא מדביקים בצ'אט.</b></li>
-    <li>באותו מסך מוצאים את ה-<b>Instagram app secret</b>, ושומרים בצד.</li>
-    <li>ההרשאות: <code dir="ltr">instagram_business_basic</code>, <code dir="ltr">instagram_business_manage_comments</code>, <code dir="ltr">instagram_business_manage_messages</code>. מאשרים את כולן.</li>
+    <li>יש כבר אפליקציה ב-My Apps עם Instagram login? אפשר להשתמש בה ולדלג לשלב 5 שבהמשך הרשימה. אחרת <b>Create App</b>.</li>
+    <li>שם האפליקציה: בלי "Insta", "IG" או "gram" (Meta חוסמת). אימייל קשר: שלך.</li>
+    <li>Meta עשויה לדרוש <b>Business Portfolio</b> (אפשר ליצור אחד בחינם). מוסיפים את המוצר <b>Instagram</b>.</li>
+    <li>בלוח האפליקציה: <b>Instagram &gt; API setup</b> (השם משתנה, למשל "API setup with Instagram business login"). <b>Add account</b> לחשבון המקצועי והתחברות עם אינסטגרם. נוצר <b>Instagram account ID</b> מספרי. רושמים אותו, הוא לא סוד.</li>
+    <li><b>Generate token</b> לחשבון. רושמים בצד את התוקף שמוצג (בדרך כלל כ-60 יום). שומרים את הטוקן בצד. <b>לא מדביקים בצ'אט.</b></li>
+    <li>את ה-<b>App secret</b> מוצאים ב-App settings &gt; Basic (ולעיתים גם באותו מסך). שומרים בצד.</li>
+    <li>ההרשאות: <code dir="ltr">instagram_business_basic</code>, <code dir="ltr">instagram_business_manage_comments</code>, <code dir="ltr">instagram_business_manage_messages</code>. בגרסת Unified Login הן עשויות להופיע בלי "business" (למשל <code dir="ltr">instagram_manage_comments</code>). מאשרים את כולן.</li>
   </ol>
-  <div class="ok"><b>איך יודעים שהצליח:</b> ידועים לך ה-Instagram account ID, הטוקן וה-app secret.</div>
-  <p class="stuck">אם האפשרות לא מופיעה: מחפשים בתפריט Products. Meta משנה מסכים לעיתים, והעיקרון נשאר זהה.</p>
+  <div class="ok"><b>איך יודעים שהצליח:</b> ידועים לך ה-Instagram account ID, הטוקן (ותוקפו) וה-app secret.</div>
+  <p class="stuck">אם האפשרות לא מופיעה: מחפשים בתפריט Products. Meta לא נותנת ליצור טוקן: ודאו שהחשבון מקצועי וציבורי ושהאפליקציה מחוברת ל-Business Portfolio.</p>
   <label class="check"><input type="checkbox"> סיימתי את השלב</label>
 </section>
 
@@ -141,8 +143,8 @@ npx wrangler whoami</pre></div>
   <div class="code"><button class="copy" type="button">העתקה</button><pre>npm run setup -- --apply --instagram-user-id &lt;ה-Instagram account ID&gt;</pre></div>
   <ol>
     <li>הסקריפט מציג את חשבון ה-Cloudflare. מקלידים <code>yes</code> אם זה הנכון.</li>
-    <li>מקלידים את הטוקן ואת ה-app secret כשנשאל (לא רואים אותם בזמן ההקלדה, וזה תקין).</li>
-    <li>בסוף מוצגות כתובת הדשבורד וכתובת ה-webhook.</li>
+    <li>מקלידים את הטוקן ואת ה-app secret כשנשאל (לא רואים אותם בזמן ההקלדה, וזה תקין). הסקריפט בודק את הטוקן מול Meta לפני שהוא יוצר משהו בענן.</li>
+    <li>בסוף הוא גם מנסה לרשום את החשבון לאירועי תגובות והודעות. מוצגות כתובת הדשבורד וכתובת ה-webhook.</li>
     <li>הסיסמה וה-Verify token נשמרים בקובץ <code dir="ltr">d-me-tokens.txt</code>. פותחים אותו בעצמך, מעתיקים למנהל סיסמאות, ומוחקים אותו.</li>
   </ol>
   <div class="ok"><b>איך יודעים שהצליח:</b> <code dir="ltr">/health</code> בכתובת שלך מחזיר <code dir="ltr">{"ok":true}</code>. הסקריפט בודק זאת בעצמו.</div>
@@ -157,7 +159,8 @@ npx wrangler whoami</pre></div>
     <li>באפליקציה ב-Meta, באותו מסך API setup, בחלק <b>Configure webhooks</b>.</li>
     <li><b>Callback URL:</b> כתובת ה-webhook משלב 4 (נגמרת ב-<code dir="ltr">/webhook/instagram</code>).</li>
     <li><b>Verify token:</b> הערך מהקובץ <code dir="ltr">d-me-tokens.txt</code>. לוחצים <b>Verify and save</b>.</li>
-    <li>מסמנים את האירועים <b>comments</b> ו-<b>messages</b>, ומאפשרים מנוי לחשבון.</li>
+    <li>מסמנים את האירועים <b>comments</b> ו-<b>messages</b>.</li>
+    <li>שני דברים שונים: ה-webhook של האפליקציה (עכשיו), ו<b>מנוי של החשבון</b> לאירועים. את המנוי ההתקנה ניסתה לעשות בעצמה. אם היא כשלה, מפעילים אותו בלוח של Meta. בלי מנוי של החשבון ה-webhook שקט.</li>
   </ol>
   <div class="ok"><b>איך יודעים שהצליח:</b> Meta מאשרת את ה-Callback בלי שגיאה.</div>
   <p class="stuck">Meta לא מאשרת: בודקים שה-Verify token והכתובת תואמים. אם אחר כך אירועים מקבלים 401: ה-app secret שהוזן אינו זה ש-Meta חותמת איתו. מנסים את ה-App secret של האפליקציה (App settings, Basic) ומחליפים:</p>
@@ -195,7 +198,7 @@ npx wrangler whoami</pre></div>
 <section class="step" id="s8" data-step="8">
   <div class="step-head"><span class="num">8</span><h2>תחזוקה</h2></div>
   <h3>חידוש הטוקן, כל כ-50 יום</h3>
-  <p>הטוקן של אינסטגרם פג אחרי כ-60 יום. מרעננים כשבועיים לפני, ומוסיפים תזכורת ביומן. קריאה אחת מחזירה טוקן חדש:</p>
+  <p>בודקים בלוח של Meta מה תוקף הטוקן. אם הוא פג אחרי כ-60 יום, מרעננים כשבועיים לפני ומוסיפים תזכורת ביומן (טוקן של משתמש מערכת לא פג). קריאה אחת מחזירה טוקן חדש:</p>
   <div class="code"><button class="copy" type="button">העתקה</button><pre>https://graph.instagram.com/refresh_access_token?grant_type=ig_refresh_token&amp;access_token=&lt;הטוקן הנוכחי&gt;</pre></div>
   <p>ואז שומרים אותו (מקלידים בהזנה מוסתרת):</p>
   <div class="code"><button class="copy" type="button">העתקה</button><pre>npx wrangler secret put IG_ACCESS_TOKEN --config wrangler.local.jsonc</pre></div>

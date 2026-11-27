@@ -87,13 +87,41 @@ function run(label, command, args, { quiet = false } = {}) {
 const wrangler = (label, args) => run(label, isWindows ? "npx.cmd" : "npx", ["wrangler", ...args]);
 const token = () => randomBytes(32).toString("base64url");
 
-function writeLocalConfig({ workerName, databaseName, databaseId, instagramUserId }) {
+function writeLocalConfig({ workerName, databaseName, databaseId, instagramUserId, graphHost }) {
   const config = JSON.parse(readFileSync(join(root, "wrangler.jsonc"), "utf8"));
   config.name = workerName;
   config.vars.IG_USER_ID = instagramUserId;
+  if (graphHost) config.vars.IG_GRAPH_HOST = graphHost;
   config.d1_databases[0].database_name = databaseName;
   config.d1_databases[0].database_id = databaseId;
   writeFileSync(localConfig, `${JSON.stringify(config, null, 2)}\n`);
+}
+
+// Meta serves new apps (Unified Login) and older apps (Instagram Login) from different hosts.
+// Ask both which one accepts this token for this account, instead of assuming.
+async function detectGraphHost(accessToken, instagramUserId, version) {
+  const reasons = [];
+  for (const host of ["graph.instagram.com", "graph.facebook.com"]) {
+    try {
+      const response = await fetch(`https://${host}/${version}/${instagramUserId}?fields=username`, {
+        headers: { Authorization: `Bearer ${accessToken}` },
+      });
+      const body = await response.json().catch(() => ({}));
+      if (response.ok) return { host, username: body.username ?? "" };
+      reasons.push(`${host}: ${body?.error?.message ?? response.status}`);
+    } catch (error) {
+      reasons.push(`${host}: ${error.message}`);
+    }
+  }
+  return { host: null, reasons };
+}
+
+async function subscribeAccount(host, accessToken, instagramUserId, version) {
+  const url = new URL(`https://${host}/${version}/${instagramUserId}/subscribed_apps`);
+  url.searchParams.set("subscribed_fields", "comments,messages");
+  const response = await fetch(url, { method: "POST", headers: { Authorization: `Bearer ${accessToken}` } });
+  const body = await response.json().catch(() => ({}));
+  return response.ok ? { ok: true } : { ok: false, message: body?.error?.message ?? String(response.status) };
 }
 
 async function main() {
@@ -123,11 +151,11 @@ async function main() {
   console.log(`Instagram user ID: ${instagramUserId || "(asked when --apply is used)"}`);
   console.log("\nWhen --apply is used:");
   console.log("1. Show the Cloudflare account that wrangler is logged in to, and ask you to confirm it");
-  console.log("2. Run the tests and a dry deployment");
-  console.log("3. Create the D1 database and apply the migrations");
-  console.log("4. Ask for the Instagram access token and the Meta app secret (hidden input)");
+  console.log("2. Ask for the Instagram access token and the Meta app secret (hidden input), and check the token with Meta");
+  console.log("3. Run the tests and a dry deployment");
+  console.log("4. Create the D1 database and apply the migrations");
   console.log("5. Generate the verify token and the admin password, saved to d-me-tokens.txt");
-  console.log("6. Deploy the Worker, then check /health");
+  console.log("6. Deploy the Worker, check /health, and subscribe the Instagram account to comments and messages");
   if (!args.apply) {
     console.log("\nPlan only. Nothing was changed. Run the same command with --apply in your own terminal to install.");
     return;
@@ -138,21 +166,31 @@ async function main() {
     const answer = await ask("\nIs this the Cloudflare account you want to install into? Type yes to continue: ");
     if (answer.toLowerCase() !== "yes") { console.log("Stopped. Nothing was changed."); return; }
   }
-  if (!args.skipTests) await run("Tests", isWindows ? "npm.cmd" : "npm", ["test"]);
-  await wrangler("Dry deployment", ["deploy", "--dry-run"]);
-
-  writeLocalConfig({ workerName, databaseName, databaseId: "PENDING", instagramUserId });
-  await wrangler("Create D1", ["d1", "create", databaseName, "--location", location, "--config", localConfig]);
-  const info = await run("Read D1 id", isWindows ? "npx.cmd" : "npx", ["wrangler", "d1", "info", databaseName, "--json", "--config", localConfig], { quiet: true });
-  const idMatch = /"uuid"\s*:\s*"([0-9a-f-]{36})"/i.exec(info);
-  if (!idMatch) throw new Error("The database was created but its id could not be read. Check the D1 page in the Cloudflare dashboard before retrying.");
-  writeLocalConfig({ workerName, databaseName, databaseId: idMatch[1], instagramUserId });
-  await wrangler("Apply migrations", ["d1", "migrations", "apply", databaseName, "--remote", "--config", localConfig]);
-
   console.log("\nEnter the Meta credentials. Input is hidden and is never saved to a file in this folder.");
   const accessToken = process.env.DME_IG_ACCESS_TOKEN || await askHidden("Instagram access token: ");
   const appSecret = process.env.DME_IG_APP_SECRET || await askHidden("Meta app secret: ");
   if (!accessToken || !appSecret) throw new Error("Both the Instagram access token and the Meta app secret are required.");
+  const baseConfig = JSON.parse(readFileSync(join(root, "wrangler.jsonc"), "utf8"));
+  const graphVersion = baseConfig.vars.IG_GRAPH_API_VERSION;
+  console.log("\n[Checking the token with Meta]");
+  const detected = await detectGraphHost(accessToken, instagramUserId, graphVersion);
+  if (!detected.host) {
+    throw new Error(`Meta did not accept this token for account ${instagramUserId}. Nothing was created. Check the token, the account ID and the permissions.\n  ${detected.reasons.join("\n  ")}`);
+  }
+  const graphHost = detected.host;
+  console.log(`Token accepted by ${graphHost}${detected.username ? ` for @${detected.username}` : ""}.`);
+
+  if (!args.skipTests) await run("Tests", isWindows ? "npm.cmd" : "npm", ["test"]);
+  await wrangler("Dry deployment", ["deploy", "--dry-run"]);
+
+  writeLocalConfig({ workerName, databaseName, databaseId: "PENDING", instagramUserId, graphHost });
+  await wrangler("Create D1", ["d1", "create", databaseName, "--location", location, "--config", localConfig]);
+  const info = await run("Read D1 id", isWindows ? "npx.cmd" : "npx", ["wrangler", "d1", "info", databaseName, "--json", "--config", localConfig], { quiet: true });
+  const idMatch = /"uuid"\s*:\s*"([0-9a-f-]{36})"/i.exec(info);
+  if (!idMatch) throw new Error("The database was created but its id could not be read. Check the D1 page in the Cloudflare dashboard before retrying.");
+  writeLocalConfig({ workerName, databaseName, databaseId: idMatch[1], instagramUserId, graphHost });
+  await wrangler("Apply migrations", ["d1", "migrations", "apply", databaseName, "--remote", "--config", localConfig]);
+
   const verifyToken = token();
   const adminToken = token();
 
@@ -177,6 +215,11 @@ async function main() {
   const health = await fetch(`${workerUrl}/health`).then((response) => response.json()).catch(() => null);
   if (!health || health.ok !== true) throw new Error(`The Worker is deployed at ${workerUrl} but /health did not answer ok. Wait a minute and open it again.`);
 
+  const subscription = await subscribeAccount(graphHost, accessToken, instagramUserId, graphVersion);
+  console.log(subscription.ok
+    ? "\nThe Instagram account is subscribed to comments and messages."
+    : `\nCould not subscribe the account automatically (${subscription.message}). Turn on the comments and messages subscription for the account in the Meta app dashboard.`);
+
   writeFileSync(tokensPath, [
     "D-ME private tokens. Move them to a password manager, then delete this file.",
     `Admin password (the "management key" in the dashboard): ${adminToken}`,
@@ -184,7 +227,7 @@ async function main() {
     "",
   ].join("\n"), { mode: 0o600 });
   writeFileSync(manifestPath, `${JSON.stringify({
-    workerName, databaseName, databaseId: idMatch[1], instagramUserId,
+    workerName, databaseName, databaseId: idMatch[1], instagramUserId, graphHost,
     workerUrl, adminUrl: `${workerUrl}/admin`, callbackUrl: `${workerUrl}/webhook/instagram`,
     createdAt: new Date().toISOString(),
   }, null, 2)}\n`);

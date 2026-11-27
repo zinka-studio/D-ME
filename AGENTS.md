@@ -24,7 +24,7 @@ D-ME היא אוטומציה לאינסטגרם שרצה על Cloudflare Workers
 0. היכרות ובדיקת דרישות: Node.js, git, חשבון אינסטגרם מקצועי (עסקי או יוצר).
 1. פתיחת חשבון Cloudflare (חינמי).
 2. התחברות של הכלי ל-Cloudflare (`npx wrangler login`).
-3. חשבון מפתחים ואפליקציה ב-Meta, והרשאות.
+3. חשבון מפתחים ואפליקציה ב-Meta, והרשאות. אפליקציות חדשות (מאוקטובר 2026) משתמשות ב-Unified Login ולא ב-Instagram login הישן. ההתקנה מזהה בעצמה איזו כתובת Graph עובדת.
 4. הרצת ההתקנה: מסד נתונים, secrets, פריסה, בדיקת `/health`.
 5. חיבור ה-webhook ב-Meta.
 6. כניסה לדשבורד ויצירת האוטומציה הראשונה.
@@ -36,7 +36,7 @@ D-ME היא אוטומציה לאינסטגרם שרצה על Cloudflare Workers
 ## מבנה הקוד
 
 - `src/index.ts` הנתיבים: `/health`, `/webhook/instagram`, `/admin`, `/api/automations`, `/api/instagram/media`.
-- `src/processor.ts` מעבד את אירועי ה-webhook. `src/logic.ts` התאמת מילות מפתח והחלטת שליחה. `src/meta-api.ts` קריאות ל-Meta.
+- `src/processor.ts` מעבד את אירועי ה-webhook. כתובת ה-Graph של Meta נקבעת במשתנה `IG_GRAPH_HOST`. `src/logic.ts` התאמת מילות מפתח והחלטת שליחה. `src/meta-api.ts` קריאות ל-Meta.
 - `src/admin.ts` ו-`src/admin-ui.ts` ה-API והדשבורד. `migrations/` מסד הנתונים.
 - `scripts/setup.mjs` סקריפט ההתקנה. `wrangler.jsonc` תבנית ההגדרות, בלי ערכים אמיתיים. ההגדרות האמיתיות נכתבות ל-`wrangler.local.jsonc`, שלא נכנס ל-Git.
 - בדיקות: `npm test`. מפעילים מקומית עם `npm run dev`.

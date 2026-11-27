@@ -56,6 +56,19 @@ describe("Instagram media discovery", () => {
     ]);
   });
 
+  it("calls the configured Graph host", async () => {
+    const seen: string[] = [];
+    vi.stubGlobal("fetch", vi.fn(async (input: RequestInfo | URL) => {
+      seen.push(new URL(String(input)).host);
+      return Response.json({ data: [] });
+    }));
+    await listInstagramMedia({ ...env, IG_GRAPH_HOST: "graph.facebook.com" } as unknown as Env);
+    expect(new Set(seen)).toEqual(new Set(["graph.facebook.com"]));
+    seen.length = 0;
+    await listInstagramMedia(env);
+    expect(new Set(seen)).toEqual(new Set(["graph.instagram.com"]));
+  });
+
   it("fails clearly before making a request when the token is missing", async () => {
     await expect(listInstagramMedia({ ...env, IG_ACCESS_TOKEN: "" })).rejects.toMatchObject({
       code: "TOKEN_NOT_CONFIGURED",

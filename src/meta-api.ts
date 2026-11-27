@@ -30,12 +30,20 @@ function readMetaError(payload: unknown): { message: string; code: string } {
       : "META_API_ERROR",
   };
 }
+export const DEFAULT_GRAPH_HOST = "graph.instagram.com";
+
+/** Base URL of the Instagram Graph API. The host is configurable because Meta serves new apps (Unified Login) and older apps (Instagram Login) from different hosts. */
+export function graphBase(env: Pick<Env, "IG_GRAPH_API_VERSION"> & { IG_GRAPH_HOST?: string }): string {
+  return `https://${env.IG_GRAPH_HOST || DEFAULT_GRAPH_HOST}/${env.IG_GRAPH_API_VERSION}`;
+}
+
 export async function getFollowStatus(
   userId: string,
   accessToken: string,
   graphVersion: string,
+  graphHost: string = DEFAULT_GRAPH_HOST,
 ): Promise<boolean | null> {
-  const url = new URL(`https://graph.instagram.com/${graphVersion}/${encodeURIComponent(userId)}`);
+  const url = new URL(`https://${graphHost || DEFAULT_GRAPH_HOST}/${graphVersion}/${encodeURIComponent(userId)}`);
   url.searchParams.set("fields", "is_user_follow_business");
   const response = await fetch(url, {
     headers: { Authorization: `Bearer ${accessToken}` },
@@ -58,7 +66,7 @@ function optionalString(record: Record<string, unknown>, key: string): string | 
 }
 
 async function listMediaEdge(env: Env, edge: "media" | "stories"): Promise<InstagramMediaItem[]> {
-  const url = new URL(`https://graph.instagram.com/${env.IG_GRAPH_API_VERSION}/${env.IG_USER_ID}/${edge}`);
+  const url = new URL(`${graphBase(env)}/${env.IG_USER_ID}/${edge}`);
   url.searchParams.set("fields", edge === "stories"
     ? "id,media_type,media_url,thumbnail_url,permalink,timestamp"
     : "id,caption,media_type,media_product_type,media_url,thumbnail_url,permalink,timestamp");
@@ -111,7 +119,7 @@ export async function sendInstagramMessage(
   env: Env,
   requestBody: Record<string, unknown>,
 ): Promise<MetaSendResponse> {
-  const url = `https://graph.instagram.com/${env.IG_GRAPH_API_VERSION}/${env.IG_USER_ID}/messages`;
+  const url = `${graphBase(env)}/${env.IG_USER_ID}/messages`;
   const response = await fetch(url, {
     method: "POST",
     headers: {
@@ -138,7 +146,7 @@ export async function sendInstagramCommentReply(
   commentId: string,
   message: string,
 ): Promise<MetaSendResponse> {
-  const url = `https://graph.instagram.com/${env.IG_GRAPH_API_VERSION}/${encodeURIComponent(commentId)}/replies`;
+  const url = `${graphBase(env)}/${encodeURIComponent(commentId)}/replies`;
   const response = await fetch(url, {
     method: "POST",
     headers: { Authorization: `Bearer ${env.IG_ACCESS_TOKEN}`, "Content-Type": "application/json" },

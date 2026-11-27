@@ -60,7 +60,7 @@ async function processComment(event: CommentEvent, env: Env): Promise<void> {
       if (commentReply) await sendInstagramCommentReply(env, event.commentId, renderMessage(commentReply, { url: matched.automation.targetUrl, username: event.username, keyword: matched.keyword }));
     }
     const followStatus = matched.automation.followGate
-      ? await getFollowStatus(event.userId, env.IG_ACCESS_TOKEN, env.IG_GRAPH_API_VERSION)
+      ? await getFollowStatus(event.userId, env.IG_ACCESS_TOKEN, env.IG_GRAPH_API_VERSION, env.IG_GRAPH_HOST)
       : null;
     const decision = decideDelivery(matched.automation, followStatus);
     const message = decision.deliverLink
@@ -132,7 +132,7 @@ async function processStoryReply(event: StoryReplyEvent, env: Env): Promise<void
 
   try {
     const followStatus = matched.automation.followGate
-      ? await getFollowStatus(event.userId, env.IG_ACCESS_TOKEN, env.IG_GRAPH_API_VERSION)
+      ? await getFollowStatus(event.userId, env.IG_ACCESS_TOKEN, env.IG_GRAPH_API_VERSION, env.IG_GRAPH_HOST)
       : null;
     const decision = decideDelivery(matched.automation, followStatus);
     const message = decision.deliverLink
@@ -191,7 +191,7 @@ async function processFollowCheck(userId: string, env: Env): Promise<void> {
   const automation = await getAutomation(env, session.automation_id);
   if (!automation) return;
 
-  const followStatus = await getFollowStatus(userId, env.IG_ACCESS_TOKEN, env.IG_GRAPH_API_VERSION);
+  const followStatus = await getFollowStatus(userId, env.IG_ACCESS_TOKEN, env.IG_GRAPH_API_VERSION, env.IG_GRAPH_HOST);
   const decision = decideDelivery(automation, followStatus);
   const message = decision.deliverLink
     ? { text: renderMessage(automation.replyOptions[Math.floor(Math.random() * automation.replyOptions.length)] ?? automation.messageTemplate, { url: automation.targetUrl, username: "", keyword: "" }) }
