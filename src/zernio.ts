@@ -140,7 +140,7 @@ export function toRule(automation: ZernioAutomation) {
 
 interface RuleInput {
   id?: unknown; enabled?: unknown; mediaIds?: unknown; mediaMode?: unknown; triggerSource?: unknown;
-  keywords?: unknown; matchMode?: unknown; targetUrl?: unknown; messageTemplate?: unknown;
+  keywords?: unknown; anyComment?: unknown; matchMode?: unknown; targetUrl?: unknown; messageTemplate?: unknown;
   commentReplyOptions?: unknown; followGate?: unknown; followPrompt?: unknown; followButton?: unknown;
 }
 
@@ -159,7 +159,9 @@ export function toZernioBody(input: RuleInput) {
   const keywords = Array.isArray(input.keywords)
     ? input.keywords.filter((value): value is string => typeof value === "string" && Boolean(value.trim())).map((value) => value.trim()).slice(0, 20)
     : [];
-  if (!keywords.length) throw new Error("keywords is required");
+  const anyComment = input.anyComment === true;
+  if (anyComment) keywords.length = 0;
+  else if (!keywords.length) throw new Error("keywords is required");
   const targetUrl = text(input.targetUrl, "targetUrl", 2_000);
   if (!/^https?:\/\//i.test(targetUrl)) throw new Error("targetUrl must start with http:// or https://");
   const template = text(input.messageTemplate, "messageTemplate", 1_000);
@@ -348,7 +350,7 @@ async function handlePosts(request: Request, env: Env, url: URL): Promise<Respon
       try {
         const result = await zernio<{ automation?: ZernioAutomation }>(env, "/comment-automations", {
           method: "POST",
-          body: JSON.stringify({ ...automationBody, trigger: "comment", profileId, accountId, name: `D-ME ${automationBody.keywords.slice(0, 2).join(", ")}`, ...(live ? { platformPostId: live } : { postId: post._id }) }),
+          body: JSON.stringify({ ...automationBody, trigger: "comment", profileId, accountId, name: `D-ME ${automationBody.keywords.slice(0, 2).join(", ") || "כל תגובה"}`, ...(live ? { platformPostId: live } : { postId: post._id }) }),
         });
         automation = result.automation ?? null;
       } catch (error) {
@@ -408,7 +410,7 @@ export async function handleZernioAdmin(request: Request, env: Env, url: URL): P
       const existingId = typeof input.id === "string" && /^[0-9a-f]{24}$/i.test(input.id) ? input.id : "";
       const mediaIds = Array.isArray(input.mediaIds) ? input.mediaIds.filter((value): value is string => typeof value === "string") : [];
       const specific = body.trigger === "comment" ? mediaIds.filter((value) => value && value !== "*") : [];
-      const label = body.keywords.slice(0, 2).join(", ");
+      const label = body.keywords.slice(0, 2).join(", ") || "כל תגובה";
 
       if (existingId) {
         const patch = { ...body, ...(specific.length ? { platformPostId: specific[0] } : {}), name: `D-ME ${label}` };

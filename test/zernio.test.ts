@@ -50,6 +50,11 @@ describe("Zernio mode", () => {
     expect(body.trigger).toBe("story_reply");
   });
 
+  it("sends to any comment when the any-comment toggle is on", () => {
+    const body = toZernioBody({ anyComment: true, keywords: ["ignored"], targetUrl: "https://example.com", messageTemplate: "hi", followGate: false });
+    expect(body.keywords).toEqual([]);
+  });
+
   it("rejects a missing keyword and a non-http link", () => {
     expect(() => toZernioBody({ keywords: [], targetUrl: "https://a.b", messageTemplate: "x", followPrompt: "p" })).toThrow("keywords");
     expect(() => toZernioBody({ keywords: ["a"], targetUrl: "javascript:alert(1)", messageTemplate: "x", followPrompt: "p" })).toThrow("targetUrl");
