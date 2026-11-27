@@ -1,14 +1,14 @@
 import { handleAdminUi } from "./admin-ui";
 import { handleZernioAdmin } from "./zernio";
-import heeboHebrew from "../public/fonts/Heebo-hebrew.woff2";
-import heeboLatin from "../public/fonts/Heebo-latin.woff2";
+import rubikHebrew from "../public/fonts/Rubik-hebrew.woff2";
+import rubikLatin from "../public/fonts/Rubik-latin.woff2";
 import iconEdit from "../public/icons/action-edit.svg";
 import iconDelete from "../public/icons/action-delete.svg";
 
 /** Fonts and icons are bundled into the Worker, so a deploy is a single upload. */
 const STATIC_FILES: Record<string, { body: ArrayBuffer | string; type: string }> = {
-  "/fonts/Heebo-hebrew.woff2": { body: heeboHebrew, type: "font/woff2" },
-  "/fonts/Heebo-latin.woff2": { body: heeboLatin, type: "font/woff2" },
+  "/fonts/Rubik-hebrew.woff2": { body: rubikHebrew, type: "font/woff2" },
+  "/fonts/Rubik-latin.woff2": { body: rubikLatin, type: "font/woff2" },
   "/icons/action-edit.svg": { body: iconEdit, type: "image/svg+xml" },
   "/icons/action-delete.svg": { body: iconDelete, type: "image/svg+xml" },
 };
@@ -28,7 +28,7 @@ export default {
       if (request.method === "GET" && url.pathname === "/health") {
         return json({ ok: true, service: "d-me", environment: env.ENVIRONMENT });
       }
-      if (url.pathname.startsWith("/api/automations") || url.pathname === "/api/instagram/media" || url.pathname === "/api/status" || url.pathname === "/api/instagram/profile") {
+      if (url.pathname.startsWith("/api/automations") || url.pathname.startsWith("/api/posts") || url.pathname === "/api/media/upload" || url.pathname === "/api/instagram/media" || url.pathname === "/api/status" || url.pathname === "/api/instagram/profile") {
         return handleZernioAdmin(request, env, url);
       }
       return json({ error: "Not found" }, 404);

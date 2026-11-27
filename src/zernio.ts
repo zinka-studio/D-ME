@@ -88,6 +88,7 @@ interface ZernioAutomation {
   trigger?: string;
   accountId?: string;
   platformPostId?: string;
+  postId?: string;
   postTitle?: string;
   keywords?: string[];
   matchMode?: string;
@@ -114,6 +115,7 @@ export function toRule(automation: ZernioAutomation) {
   const stats = automation.stats ?? {};
   return {
     id: automation.id,
+    postId: automation.postId ?? null,
     enabled: automation.isActive !== false,
     mediaId: postId || "*",
     mediaIds: [postId || "*"],
@@ -242,10 +244,139 @@ async function readStatus(env: Env) {
   };
 }
 
+const UPLOAD_TYPES = ["image/jpeg", "image/png", "image/webp", "video/mp4", "video/quicktime", "video/webm"];
+const MAX_UPLOAD_BYTES = 100 * 1024 * 1024;
+
+interface ZernioPost {
+  _id?: string; content?: string; status?: string; scheduledFor?: string; timezone?: string;
+  mediaItems?: Array<{ type?: string; url?: string; thumbnail?: string }>;
+  platforms?: Array<{ platform?: string; status?: string; platformPostId?: string; platformPostUrl?: string; errorMessage?: string }>;
+}
+
+function toScheduledPost(post: ZernioPost) {
+  const instagram = post.platforms?.find((platform) => platform.platform === "instagram") ?? post.platforms?.[0];
+  const first = post.mediaItems?.[0];
+  return {
+    id: post._id ?? "",
+    caption: post.content ?? "",
+    status: instagram?.status ?? post.status ?? "",
+    scheduledFor: post.scheduledFor ?? null,
+    mediaCount: post.mediaItems?.length ?? 0,
+    mediaType: first?.type ?? null,
+    mediaUrl: first?.thumbnail ?? first?.url ?? null,
+    platformPostUrl: instagram?.platformPostUrl ?? null,
+    error: instagram?.errorMessage ?? null,
+  };
+}
+
+interface PostInput {
+  caption?: unknown; media?: unknown; when?: unknown; scheduledFor?: unknown; timezone?: unknown;
+  thumbOffset?: unknown; coverUrl?: unknown; automation?: unknown;
+}
+
+function mediaUrl(value: unknown): string {
+  if (typeof value !== "string" || !/^https:\/\/[^\s]+$/i.test(value) || value.length > 2_000) throw new Error("A media URL is not valid");
+  return value;
+}
+
+/** Dashboard post form -> Zernio post body. when: now | schedule | draft. */
+export function toZernioPost(input: PostInput, accountId: string) {
+  const media = Array.isArray(input.media) ? input.media.slice(0, 10) : [];
+  if (!media.length) throw new Error("Add at least one photo or video");
+  const mediaItems = media.map((item) => {
+    const record = (item ?? {}) as { url?: unknown; type?: unknown };
+    return { type: record.type === "video" ? "video" : "image", url: mediaUrl(record.url) };
+  });
+  const caption = typeof input.caption === "string" ? input.caption.trim() : "";
+  if (caption.length > 2_200) throw new Error("The caption is longer than Instagram allows (2,200 characters)");
+  const platformSpecificData: Record<string, unknown> = {};
+  if (typeof input.coverUrl === "string" && input.coverUrl) platformSpecificData.instagramThumbnail = mediaUrl(input.coverUrl);
+  else if (typeof input.thumbOffset === "number" && input.thumbOffset > 0) platformSpecificData.thumbOffset = Math.round(input.thumbOffset);
+  const body: Record<string, unknown> = {
+    content: caption,
+    mediaItems,
+    platforms: [{ platform: "instagram", accountId, ...(Object.keys(platformSpecificData).length ? { platformSpecificData } : {}) }],
+  };
+  if (input.when === "now") body.publishNow = true;
+  else if (input.when === "draft") body.isDraft = true;
+  else {
+    const when = typeof input.scheduledFor === "string" ? new Date(input.scheduledFor) : null;
+    if (!when || Number.isNaN(when.getTime())) throw new Error("Choose a date and time");
+    if (when.getTime() < Date.now() + 60_000) throw new Error("The scheduled time has to be in the future");
+    body.scheduledFor = when.toISOString();
+    body.timezone = typeof input.timezone === "string" && input.timezone ? input.timezone : "Asia/Jerusalem";
+  }
+  return body;
+}
+
+async function handlePosts(request: Request, env: Env, url: URL): Promise<Response | null> {
+  if (request.method === "POST" && url.pathname === "/api/media/upload") {
+    const contentType = (request.headers.get("content-type") ?? "").split(";")[0]?.trim() ?? "";
+    if (!UPLOAD_TYPES.includes(contentType)) return json({ error: "Only JPG, PNG, WEBP, MP4, MOV or WEBM files" }, 415);
+    const size = Number(request.headers.get("content-length") || "0");
+    if (!size || size > MAX_UPLOAD_BYTES) return json({ error: "Files up to 100MB can be uploaded from the dashboard" }, 413);
+    const filename = (url.searchParams.get("filename") || "upload").replace(/[^\w.\-]+/g, "_").slice(0, 120);
+    const presign = await zernio<{ uploadUrl?: string; publicUrl?: string }>(env, "/media/presign", {
+      method: "POST", body: JSON.stringify({ filename, contentType, size }),
+    });
+    if (!presign.uploadUrl || !presign.publicUrl) return json({ error: "Zernio did not return an upload address" }, 502);
+    const put = await fetch(presign.uploadUrl, { method: "PUT", headers: { "Content-Type": contentType, "Content-Length": String(size) }, body: request.body });
+    if (!put.ok) return json({ error: `The upload failed (${put.status})` }, 502);
+    return json({ url: presign.publicUrl, type: contentType.startsWith("video/") ? "video" : "image" }, 201);
+  }
+
+  if (request.method === "GET" && url.pathname === "/api/posts") {
+    const { accountId } = await resolveAccount(env);
+    const query = new URLSearchParams({ platform: "instagram", accountId, limit: "50", sortBy: "scheduled-asc" });
+    const status = url.searchParams.get("status");
+    if (status && /^[a-z_]+$/.test(status)) query.set("status", status);
+    const payload = await zernio<{ posts?: ZernioPost[] }>(env, `/posts?${query}`);
+    return json({ posts: (payload.posts ?? []).map(toScheduledPost) });
+  }
+
+  if (request.method === "POST" && url.pathname === "/api/posts") {
+    if (Number(request.headers.get("content-length") || "0") > 64_000) return json({ error: "Request body is too large" }, 413);
+    const input = await request.json() as PostInput;
+    const { accountId, profileId } = await resolveAccount(env);
+    const automationBody = input.automation ? toZernioBody(input.automation as RuleInput) : null;
+    const created = await zernio<{ post?: ZernioPost }>(env, "/posts", { method: "POST", body: JSON.stringify(toZernioPost(input, accountId)) });
+    const post = created.post ?? {};
+    let automation: ZernioAutomation | null = null;
+    let automationError: string | null = null;
+    if (automationBody && post._id) {
+      const live = post.platforms?.find((platform) => platform.platform === "instagram")?.platformPostId;
+      try {
+        const result = await zernio<{ automation?: ZernioAutomation }>(env, "/comment-automations", {
+          method: "POST",
+          body: JSON.stringify({ ...automationBody, trigger: "comment", profileId, accountId, name: `D-ME ${automationBody.keywords.slice(0, 2).join(", ")}`, ...(live ? { platformPostId: live } : { postId: post._id }) }),
+        });
+        automation = result.automation ?? null;
+      } catch (error) {
+        automationError = error instanceof Error ? error.message : "The automation was not created";
+      }
+    }
+    return json({ post: toScheduledPost(post), automation: automation ? toRule(automation) : null, automationError }, 201);
+  }
+
+  const action = /^\/api\/posts\/([0-9a-f]{24})(\/publish)?$/i.exec(url.pathname);
+  if (action && request.method === "POST" && action[2]) {
+    const result = await zernio<{ post?: ZernioPost }>(env, `/posts/${action[1]}`, { method: "PUT", body: JSON.stringify({ publishNow: true }) });
+    return json({ post: result.post ? toScheduledPost(result.post) : null });
+  }
+  if (action && request.method === "DELETE" && !action[2]) {
+    await zernio(env, `/posts/${action[1]}`, { method: "DELETE" });
+    return json({ deleted: true });
+  }
+  return null;
+}
+
 export async function handleZernioAdmin(request: Request, env: Env, url: URL): Promise<Response> {
   if (!await isAuthorized(request, env)) return json({ error: "Unauthorized" }, 401);
   if (!zernioEnabled(env)) return json({ error: "ZERNIO_API_KEY is not set on this Worker. Run: npm run setup -- --apply" }, 503);
   try {
+    const postResponse = await handlePosts(request, env, url);
+    if (postResponse) return postResponse;
+
     if (request.method === "GET" && url.pathname === "/api/instagram/profile") {
       const account = await resolveAccount(env);
       return json({ profile: { username: account.username ?? "", profilePictureUrl: account.profilePicture ?? null } });

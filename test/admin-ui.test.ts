@@ -10,22 +10,20 @@ describe("admin interface", () => {
     expect(response.headers.get("content-type")).toContain("text/html");
     expect(response.headers.get("content-security-policy")).toContain("frame-ancestors 'none'");
     expect(response.headers.get("x-content-type-options")).toBe("nosniff");
-    expect(html).toContain("אילו אייטמים עובדים");
-    expect(html).toContain('id="appDrawer"');
-    expect(html).toContain('id="drawerClose"');
-    expect(html).toContain('class="rail-metrics"');
+    expect(html).toContain("על איזה פוסט?");
+    expect(html).toContain('data-view="automation"');
+    expect(html).toContain('data-view="post"');
+    expect(html).toContain('data-view="scheduled"');
     expect(html).toContain('id="railCards"');
+    expect(html).toContain('id="withAutomation"');
+    expect(html).toContain('id="summaryList"');
+    expect(html).toContain('id="savePaused"');
     expect(html).toContain('class="brand-name">D-ME');
-    expect(html).toContain('<span class="step">04</span>');
-    expect(html).toContain('<span class="step">05</span>');
-    expect(html).not.toContain("הפוסט הבא");
-    expect(html).not.toContain('__next__');
     expect(html).toContain('name="contentFilter"');
-    expect(html).toMatch(/panel-heading[\s\S]*contentTitle[\s\S]*content-filter[\s\S]*refreshMedia/);
     expect(html).toContain('value="story"');
     expect(html).toContain('value="reel"');
     expect(html).not.toContain('value="highlight"');
-    expect(html).not.toContain('class="dashboard-strip"');
+    expect(html).not.toContain("הפוסט הבא");
     expect(html).toContain("/admin/app.js");
   });
 
@@ -41,32 +39,22 @@ describe("admin interface", () => {
     const scriptBody = await script.text();
     expect(stylesBody).toContain("--design-px:0.052083333vw");
     expect(stylesBody).toContain("@media(max-width:640px){:root{--design-px:0.256410256vw}}");
-    expect(stylesBody).toContain("/fonts/Heebo-hebrew.woff2");
-    expect(stylesBody).toContain("--bg:#fff");
-    expect(stylesBody).toContain("--accent:#ff6f00");
-    expect(stylesBody).toContain("@media(min-width:1651px)");
-    expect(stylesBody).toContain("@media(min-width:1051px) and (max-width:1650px)");
-    expect(stylesBody).not.toMatch(/Talent|Plinko|Georgia/);
+    expect(stylesBody).toContain("/fonts/Rubik-hebrew.woff2");
+    expect(stylesBody).toContain("--cobalt:#2343d6");
+    expect(stylesBody).toContain("@media(min-width:641px) and (max-width:1050px){:root{--design-px:0.090909091vw}}");
+    expect(stylesBody).not.toMatch(/Talent|Plinko|Georgia|Heebo/);
     const declarationsOnly = stylesBody.replace(/@media\s*\([^{}]+\)/g, "@media");
     expect(declarationsOnly).not.toMatch(/font-size\s*:[^;}]*\dpx\b/);
     expect(declarationsOnly).not.toMatch(/(?:width|height|padding|margin|gap|top|right|bottom|left)\s*:[^;}]*\dpx\b/);
     expect(scriptBody).toContain("sessionStorage");
-    expect(scriptBody).toContain("openDrawer");
-    expect(scriptBody).toContain("Escape");
-    expect(scriptBody).toContain("state.automations.slice(0,4)");
-    expect(scriptBody).toContain("rule.commentCount");
     expect(scriptBody).toContain("function renderRailSummary()");
-    expect(scriptBody).toContain("actionIcon('edit')");
-    expect(scriptBody).toContain("actionIcon('delete')");
     expect(scriptBody).toContain("aria-label','עריכת האוטומציה");
-    expect(scriptBody).toContain("aria-label','מחיקת האוטומציה");
-    expect(scriptBody).toContain("mediaMode:state.mediaMode");
-    expect(scriptBody).not.toContain("NEXT_MEDIA_ID");
+    expect(scriptBody).toContain("מחיקת האוטומציה");
     expect(scriptBody).toContain("__stories__");
-    expect(scriptBody).toContain("item.source==='highlight'");
-    expect(scriptBody).toContain("triggerSource:state.triggerSource");
-    expect(scriptBody).toContain("function designVw(value)");
-    expect(scriptBody).not.toContain("area.style.height='30px'");
+    expect(scriptBody).toContain("/api/media/upload");
+    expect(scriptBody).toContain("/api/posts");
+    expect(scriptBody).toContain("data-create-post");
+    expect(scriptBody).not.toContain("NEXT_MEDIA_ID");
   });
 
   it("serves the action icons used by the rules list", async () => {
@@ -74,6 +62,19 @@ describe("admin interface", () => {
       const response = await SELF.fetch(`https://worker.test/icons/${name}.svg`);
       expect(response.status).toBe(200);
       expect(response.headers.get("content-type")).toContain("image/svg+xml");
+    }
+  });
+
+  it("serves the bundled Rubik font", async () => {
+    const response = await SELF.fetch("https://worker.test/fonts/Rubik-hebrew.woff2");
+    expect(response.status).toBe(200);
+    expect(response.headers.get("content-type")).toBe("font/woff2");
+  });
+
+  it("protects post creation and uploads with the admin token", async () => {
+    for (const path of ["/api/posts", "/api/media/upload"]) {
+      const response = await SELF.fetch(`https://worker.test${path}`, { method: "POST" });
+      expect(response.status).toBe(401);
     }
   });
 

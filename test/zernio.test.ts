@@ -1,5 +1,5 @@
 import { afterEach, describe, expect, it, vi } from "vitest";
-import { handleZernioAdmin, toRule, toZernioBody, zernioEnabled } from "../src/zernio";
+import { handleZernioAdmin, toRule, toZernioBody, toZernioPost, zernioEnabled } from "../src/zernio";
 
 const env = { ADMIN_TOKEN: "admin", ZERNIO_API_KEY: "sk_test" } as unknown as Env;
 const auth = { Authorization: "Bearer admin", "Content-Type": "application/json" };
@@ -82,6 +82,32 @@ describe("Zernio mode", () => {
     expect(payload.providers).toHaveLength(1);
     expect(payload.plan.name).toBe("Hobby");
     expect(payload.plan.usage.uploads).toBe(40);
+  });
+
+  it("builds a scheduled Instagram carousel with a cover offset", () => {
+    const at = new Date(Date.now() + 86_400_000).toISOString();
+    const body = toZernioPost({ caption: " hi ", media: [{ url: "https://media.zernio.com/a.jpg", type: "image" }, { url: "https://media.zernio.com/b.mp4", type: "video" }], when: "schedule", scheduledFor: at, thumbOffset: 1500 }, "acc1");
+    expect(body.content).toBe("hi");
+    expect(body.mediaItems).toEqual([{ type: "image", url: "https://media.zernio.com/a.jpg" }, { type: "video", url: "https://media.zernio.com/b.mp4" }]);
+    expect(body.platforms).toEqual([{ platform: "instagram", accountId: "acc1", platformSpecificData: { thumbOffset: 1500 } }]);
+    expect(body.scheduledFor).toBe(at);
+    expect(body.timezone).toBe("Asia/Jerusalem");
+    expect(toZernioPost({ media: [{ url: "https://media.zernio.com/a.jpg" }], when: "now" }, "acc1").publishNow).toBe(true);
+    expect(() => toZernioPost({ media: [], when: "now" }, "acc1")).toThrow();
+    expect(() => toZernioPost({ media: [{ url: "javascript:alert(1)" }], when: "now" }, "acc1")).toThrow();
+    expect(() => toZernioPost({ media: [{ url: "https://media.zernio.com/a.jpg" }], when: "schedule", scheduledFor: "2000-01-01T00:00:00Z" }, "acc1")).toThrow();
+  });
+
+  it("creates a scheduled post and binds the automation to the Zernio post id", async () => {
+    const calls = stubZernio({ "/accounts?platform": accounts, "/posts": { post: { _id: "p".repeat(24), status: "scheduled", platforms: [{ platform: "instagram", status: "pending" }] } }, "/comment-automations": { automation: { id: "a2", keywords: ["לינק"], postId: "p".repeat(24) } } });
+    const url = new URL("https://w.test/api/posts");
+    const body = JSON.stringify({ caption: "x", media: [{ url: "https://media.zernio.com/a.jpg", type: "image" }], when: "schedule", scheduledFor: new Date(Date.now() + 86_400_000).toISOString(),
+      automation: { keywords: ["לינק"], targetUrl: "https://example.com", messageTemplate: "hi", followGate: false } });
+    const response = await handleZernioAdmin(new Request(url, { method: "POST", headers: auth, body }), env, url);
+    expect(response.status).toBe(201);
+    const automationCall = calls.find((call) => call.url.endsWith("/comment-automations"));
+    expect((automationCall?.body as { postId?: string })?.postId).toBe("p".repeat(24));
+    expect((automationCall?.body as { platformPostId?: string })?.platformPostId).toBeUndefined();
   });
 
   it("lists automations for the connected account's profile", async () => {
