@@ -145,7 +145,19 @@ const HTML = `<!doctype html>
             <dl class="sum" id="summaryList"></dl>
             <div class="publish" id="publishBox" hidden>
               <div class="seg two"><label><input type="radio" name="publishWhen" value="now"><span>פרסום עכשיו</span></label><label><input type="radio" name="publishWhen" value="schedule" checked><span>פרסום מתוזמן</span></label></div>
-              <div class="when" id="whenFields"><label><span>תאריך</span><input id="publishDate" type="date"></label><label><span>שעה (ישראל)</span><input id="publishTime" type="time" value="10:00"></label></div>
+              <div class="when" id="whenFields">
+                <div class="quick" id="quickWhen"></div>
+                <div class="cal">
+                  <div class="cal-head"><button type="button" class="cal-nav" data-month="-1" aria-label="החודש הקודם">›</button><b id="calTitle"></b><button type="button" class="cal-nav" data-month="1" aria-label="החודש הבא">‹</button></div>
+                  <div class="cal-grid" id="calGrid" role="grid"></div>
+                </div>
+                <div class="clock" dir="ltr" role="group" aria-label="שעה, 24 שעות">
+                  <div class="stepper"><button type="button" data-step="h" data-dir="-1" aria-label="שעה פחות">−</button><b id="hourVal">10</b><button type="button" data-step="h" data-dir="1" aria-label="שעה יותר">+</button></div>
+                  <b class="colon">:</b>
+                  <div class="stepper"><button type="button" data-step="m" data-dir="-1" aria-label="5 דקות פחות">−</button><b id="minuteVal">00</b><button type="button" data-step="m" data-dir="1" aria-label="5 דקות יותר">+</button></div>
+                </div>
+                <p class="when-text" id="whenText"></p>
+              </div>
             </div>
             <div class="actions" id="ruleActions">
               <button class="btn blue" id="saveActive" type="submit" data-enable="true">שמירה והפעלה</button>
@@ -361,9 +373,30 @@ input:focus-visible+.switch{outline:3px solid var(--cobalt);outline-offset:2px}
 .sum .missing dd{color:#b8321a}
 .sum-edit{color:var(--cobalt);font-size:var(--fs-xs);font-weight:700;text-decoration:underline;text-underline-offset:3px}
 .publish{display:grid;gap:12px}
-.when{display:grid;grid-template-columns:1fr 1fr;gap:10px}
-.when label{display:grid;gap:6px;font-size:var(--fs-xs)}
-.when input{min-height:var(--control-h);padding:8px 12px;border:var(--bw) solid var(--ink);border-radius:var(--r-sm);background:var(--surface)}
+.when{display:grid;grid-template-columns:minmax(0,460px) minmax(0,1fr);grid-template-areas:'quick quick' 'cal clock' 'cal text';align-items:start;gap:12px 20px}
+.quick{grid-area:quick}.cal{grid-area:cal}.clock{grid-area:clock;align-self:end}.when-text{grid-area:text}
+.quick{display:flex;flex-wrap:wrap;gap:8px}
+.quick button{height:40px;padding:0 14px;border:var(--bw) solid var(--ink);border-radius:99px;background:var(--surface);font-weight:500;font-size:var(--fs-xs)}
+.quick button.on{background:var(--ink);color:#fff}
+.cal{padding:12px;background:var(--surface);border:var(--bw) solid var(--ink);border-radius:var(--r-inner)}
+.cal-head{display:flex;align-items:center;justify-content:space-between;margin-bottom:8px}
+.cal-head b{font-size:var(--fs-sm)}
+.cal-nav{width:40px;height:40px;border:var(--bw) solid var(--ink);border-radius:var(--r-sm);background:var(--surface-2);font-size:var(--fs-lg);line-height:1}
+.cal-grid{display:grid;grid-template-columns:repeat(7,1fr);gap:4px;text-align:center}
+.cal-grid .dow{color:var(--text-2);font-size:var(--fs-xs);padding:4px 0}
+.cal-grid button{height:40px;border:var(--bw) solid transparent;border-radius:var(--r-sm);font-size:var(--fs-xs);font-weight:500}
+.cal-grid button:hover:not(:disabled){border-color:var(--ink)}
+.cal-grid button.today{border-color:var(--ink);border-style:dashed}
+.cal-grid button.on{background:var(--cobalt);color:#fff;border-color:var(--ink)}
+.cal-grid button:disabled{color:var(--text-2);opacity:.4;cursor:default}
+.clock{display:flex;align-items:center;justify-content:center;gap:10px}
+.stepper{display:flex;align-items:center;height:var(--control-h);border:var(--bw) solid var(--ink);border-radius:var(--r-sm);background:var(--surface);overflow:hidden}
+.stepper button{width:var(--control-h);height:100%;font-size:var(--fs-lg);font-weight:700}
+.stepper button+b,.stepper b+button{border-inline-start:var(--bw) solid var(--ink)}
+.stepper b{min-width:64px;height:100%;display:grid;place-items:center;font-size:var(--fs-lg);font-variant-numeric:tabular-nums}
+.colon{font-size:var(--fs-lg)}
+.when-text.past{background:var(--tomato-soft)}
+.when-text{margin:0;padding:10px 14px;background:var(--surface);border:var(--bw) solid var(--ink);border-radius:var(--r-sm);font-weight:500;font-size:var(--fs-sm);text-align:center}
 .actions{display:grid;grid-template-columns:1fr 1fr;gap:12px}
 .hero .text-button{justify-self:start;color:var(--ink)}
 
@@ -410,7 +443,7 @@ input:focus-visible+.switch{outline:3px solid var(--cobalt);outline-offset:2px}
 .toast.visible{opacity:1;transform:none}
 .toast.error{background:var(--tomato);color:var(--ink)}
 
-@media(max-width:1050px){.workspace{grid-template-columns:minmax(0,1fr)}.side-col{position:static;height:auto}.phone-media{flex:none;aspect-ratio:1}}
+@media(max-width:1050px){.when{grid-template-columns:minmax(0,1fr);grid-template-areas:'quick' 'cal' 'clock' 'text'}.workspace{grid-template-columns:minmax(0,1fr)}.side-col{position:static;height:auto}.phone-media{flex:none;aspect-ratio:1}}
 @media(max-width:640px){
 :root{--fs-preview:12px;--control-h:46px;--pad:16px;--gap:16px;--r-inner:10px;--fs-xs:12px;--fs-sm:14px;--fs-md:15px;--fs-lg:17px;--fs-h2:19px;--fs-kpi:26px;--shadow:4px 4px 0 var(--ink)}
 .side{position:static;inset:auto;width:auto;margin:16px 16px 0;padding:16px;gap:12px;overflow:visible}
@@ -427,7 +460,7 @@ main{margin:0;padding:16px 16px 40px}
 .panel{padding:16px}
 .step{width:38px;height:38px}
 .panel-chevron{width:32px;height:32px}
-.media-grid{grid-template-columns:repeat(4,minmax(0,1fr));gap:8px}.pager{order:3;width:100%;justify-content:center}.pager button{min-width:38px;height:38px}
+.when{grid-template-columns:minmax(0,1fr);grid-template-areas:'quick' 'cal' 'clock' 'text'}.media-grid{grid-template-columns:repeat(4,minmax(0,1fr));gap:8px}.pager{order:3;width:100%;justify-content:center}.pager button{min-width:38px;height:38px}
 .media-card.create{min-height:0;padding:8px;gap:4px}
 .media-card.create .plus{width:34px;height:34px}
 .media-card.create small{display:none}
@@ -598,7 +631,22 @@ const JAVASCRIPT = String.raw`
   /* ---------- submit ---------- */
   function ruleInput(enabled){var kw=keywordList();if(!kw.length&&!anyComment())throw new Error('צריך מילת תגובה אחת לפחות');var url=byId('targetUrl').value.trim();if(!/^https?:\/\//i.test(url))throw new Error('צריך לינק שמתחיל ב-https://');
     return {enabled:enabled,anyComment:anyComment(),triggerSource:state.view==='post'?'comment':state.triggerSource,mediaMode:state.mediaMode,keywords:kw,matchMode:form.querySelector('input[name="matchMode"]:checked').value,targetUrl:url,messageTemplate:byId('messageTemplate').value.trim(),commentReplyOptions:Array.prototype.map.call(document.querySelectorAll('.comment-reply-option'),function(a){return a.value.trim()}).filter(Boolean),followGate:byId('followGate').checked,followPrompt:byId('followPrompt').value.trim()||'עוקבים ולוחצים על הכפתור',followButton:byId('followButton').value.trim()||'עקבתי'}}
-  function defaultDate(){var d=new Date(Date.now()+864e5);byId('publishDate').value=d.toISOString().slice(0,10)}
+  var pub=null;var calView=null;
+  function israelInstant(y,m,d,h,mi){var guess=Date.UTC(y,m,d,h,mi);var parts=new Intl.DateTimeFormat('en-US',{timeZone:'Asia/Jerusalem',hourCycle:'h23',year:'numeric',month:'2-digit',day:'2-digit',hour:'2-digit',minute:'2-digit'}).formatToParts(new Date(guess));var g=function(t){return Number(parts.find(function(p){return p.type===t}).value)};var asIl=Date.UTC(g('year'),g('month')-1,g('day'),g('hour'),g('minute'));return new Date(guess-(asIl-guess))}
+  function israelToday(){var p=new Intl.DateTimeFormat('en-CA',{timeZone:'Asia/Jerusalem'}).format(new Date()).split('-');return {y:+p[0],m:+p[1]-1,d:+p[2]}}
+  function setPub(y,m,d,h,mi){pub={y:y,m:m,d:d,h:h,mi:mi};calView={y:y,m:m};renderWhen()}
+  function defaultDate(){var t=israelToday();var tomorrow=new Date(Date.UTC(t.y,t.m,t.d+1));setPub(tomorrow.getUTCFullYear(),tomorrow.getUTCMonth(),tomorrow.getUTCDate(),10,0)}
+  function quickOptions(){var t=israelToday();var day=function(n){var x=new Date(Date.UTC(t.y,t.m,t.d+n));return [x.getUTCFullYear(),x.getUTCMonth(),x.getUTCDate()]};return [['מחר 09:00',day(1),9,0],['מחר 12:00',day(1),12,0],['מחר 18:00',day(1),18,0],['מחר 20:00',day(1),20,0],['בעוד שבוע',day(7),10,0]]}
+  function renderWhen(){if(!pub)return;var t=israelToday();var opts=quickOptions();byId('quickWhen').innerHTML=opts.map(function(o,i){var on=o[1][0]===pub.y&&o[1][1]===pub.m&&o[1][2]===pub.d&&o[2]===pub.h&&o[3]===pub.mi;return '<button type="button" data-quick="'+i+'" class="'+(on?'on':'')+'">'+o[0]+'</button>'}).join('');
+    var first=new Date(Date.UTC(calView.y,calView.m,1));byId('calTitle').textContent=first.toLocaleDateString('he-IL',{month:'long',year:'numeric',timeZone:'UTC'});
+    var cells=['א','ב','ג','ד','ה','ו','ש'].map(function(d){return '<span class="dow">'+d+'</span>'});for(var i=0;i<first.getUTCDay();i++)cells.push('<span></span>');var days=new Date(Date.UTC(calView.y,calView.m+1,0)).getUTCDate();var todayKey=t.y*10000+t.m*100+t.d;
+    for(var d=1;d<=days;d++){var key=calView.y*10000+calView.m*100+d;var cls=(key===todayKey?'today ':'')+(calView.y===pub.y&&calView.m===pub.m&&d===pub.d?'on':'');cells.push('<button type="button" data-day="'+d+'" class="'+cls+'"'+(key<todayKey?' disabled':'')+'>'+d+'</button>')}
+    byId('calGrid').innerHTML=cells.join('');byId('hourVal').textContent=String(pub.h).padStart(2,'0');byId('minuteVal').textContent=String(pub.mi).padStart(2,'0');
+    var at=israelInstant(pub.y,pub.m,pub.d,pub.h,pub.mi);var label=at.toLocaleDateString('he-IL',{weekday:'long',day:'numeric',month:'long',timeZone:'Asia/Jerusalem'})+' בשעה '+String(pub.h).padStart(2,'0')+':'+String(pub.mi).padStart(2,'0');byId('whenText').textContent=at<Date.now()+60000?'המועד כבר עבר, צריך לבחור מועד עתידי':label;byId('whenText').classList.toggle('past',at<Date.now()+60000)}
+  byId('whenFields').addEventListener('click',function(event){var q=event.target.closest('[data-quick]');if(q){var o=quickOptions()[Number(q.dataset.quick)];setPub(o[1][0],o[1][1],o[1][2],o[2],o[3]);updateHero();return}
+    var nav=event.target.closest('[data-month]');if(nav){var x=new Date(Date.UTC(calView.y,calView.m+Number(nav.dataset.month),1));calView={y:x.getUTCFullYear(),m:x.getUTCMonth()};renderWhen();return}
+    var day=event.target.closest('[data-day]');if(day){pub.y=calView.y;pub.m=calView.m;pub.d=Number(day.dataset.day);renderWhen();updateHero();return}
+    var st=event.target.closest('[data-step]');if(st){var dir=Number(st.dataset.dir);if(st.dataset.step==='h')pub.h=(pub.h+dir+24)%24;else pub.mi=(pub.mi+dir*5+60)%60;renderWhen();updateHero()}});
   function openMissing(){var miss=byId('summaryList').querySelector('.missing [data-open]');if(miss){var p=byId(miss.dataset.open);setOpenPanel(p);p.scrollIntoView({behavior:'smooth',block:'start'})}}
   form.addEventListener('submit',async function(event){event.preventDefault();if(!state.token){toast('קודם מתחברים עם מפתח הניהול בתחתית התפריט',true);return}var submitter=event.submitter;
     try{if(state.view==='post'){await submitPost();return}
@@ -609,7 +657,7 @@ const JAVASCRIPT = String.raw`
     catch(error){toast(error.message,true);openMissing()}finally{submitter&&(submitter.disabled=false)}});
   async function submitPost(){if(!state.uploads.length){openMissing();throw new Error('צריך להעלות תמונה או סרטון')}if(state.uploads.some(function(u){return u.state!=='done'}))throw new Error('מחכים שההעלאה תסתיים');
     var whenValue=form.querySelector('input[name="publishWhen"]:checked').value;var payload={caption:byId('caption').value,media:state.uploads.map(function(u){return {url:u.url,type:u.type}}),when:whenValue==='now'?'now':'schedule',timezone:'Asia/Jerusalem'};
-    if(payload.when==='schedule'){var local=new Date(byId('publishDate').value+'T'+(byId('publishTime').value||'10:00'));if(isNaN(local))throw new Error('צריך תאריך ושעה');payload.scheduledFor=local.toISOString()}
+    if(payload.when==='schedule'){var at=israelInstant(pub.y,pub.m,pub.d,pub.h,pub.mi);if(at<Date.now()+60000)throw new Error('צריך לבחור מועד עתידי');payload.scheduledFor=at.toISOString()}
     if(singleVideo()){if(state.cover)payload.coverUrl=state.cover;else payload.thumbOffset=state.coverOffset||0}
     if(byId('withAutomation').checked)payload.automation=ruleInput(true);
     var what=payload.when==='now'?'לפרסם עכשיו באינסטגרם':'לתזמן ל-'+when(payload.scheduledFor).date;if(!confirm(what+'?'+(payload.automation?' האוטומציה תידלק כשהפוסט עולה.':'')))return;
